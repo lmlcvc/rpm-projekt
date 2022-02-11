@@ -26,14 +26,37 @@ dps310_temp_csv = config['dps310_temp_csv']
 dps310_pressure_csv = config['dps310_pressure_csv']
 
 headers = ['Vrijeme', 'Senzor', 'Velicina', 'Vrijednost']
+headers_string = 'Vrijeme,Senzor,Velicina,Vrijednost\n'
 MAX_ROWS = 100
+NUM_OF_SENSORS = 6
 LARGE_FONT = ("Verdana", 12)
 APP_NAME = 'Centrala za upravljanje pametnim stanom'
 
 
-def create_folder():
+# TODO: ovo je OK ako ćemo vjerovati korisniku da neće pobrisati 1-5 datoteka
+def folder_prep():
     if not os.path.exists(csv_folder):
         os.makedirs(csv_folder)
+
+    if len(os.listdir(csv_folder)) == 0:
+        open(tmp116_csv, 'a').close()
+        open(hdc2010_temp_csv, 'a').close()
+        open(hdc2010_hum_csv, 'a').close()
+        open(opt3001_csv, 'a').close()
+        open(dps310_temp_csv, 'a').close()
+        open(dps310_pressure_csv, 'a').close()
+
+    """for filename in os.listdir(csv_folder):
+        path = os.path.join(csv_folder, filename)
+        if os.path.getsize(path) == 0:
+            with open(path, 'w+') as f:
+                f.write(headers_string)"""
+
+
+def wait_for_file_input(filepath):
+    while ((os.path.exists(filepath) and os.path.getsize(filepath) == 0)
+           or not os.path.exists(filepath)):
+        pass
 
 
 # Read file and remove oldest redundant records
@@ -56,10 +79,19 @@ def impl_circular_buffer(path):
 
 
 def make_plots(filepath):
+    """if (os.path.exists(filepath) and os.path.getsize(filepath) == 0)\
+            or not os.path.exists(filepath):
+        return"""
+
+    wait_for_file_input(filepath)
+
     with open(filepath) as f:
+        wait_for_file_input(filepath)
         impl_circular_buffer(filepath)
 
         df = pd.read_csv(f, names=headers)
+        print(df.get('Vrijednost'))
+        print(df)
         figure = plt.Figure(figsize=(5, 4), dpi=100)
         ax = figure.add_subplot(111)
         # line = FigureCanvasTkAgg(figure, app)
@@ -77,7 +109,7 @@ def store_to_csv():
             open(dps310_temp_csv, 'a', newline='') as dps310_temp_file, \
             open(dps310_pressure_csv, 'a', newline='') as dps310_pressure_file:
 
-        for i in range(30):
+        for i in range(NUM_OF_SENSORS):
             line = serial.readline()  # read a byte string
 
             now = datetime.now()
@@ -102,13 +134,22 @@ def store_to_csv():
                 print(string)
 
 
+# TODO: ovo je PRESTRAŠNO, treba ovo napraviti kroz nasljeđivanje jer su sve metode iste
 class TMP116Page(tk.Frame):
 
-    def update_plots(self):
+    def update_data(self):
+        wait_for_file_input(tmp116_csv)
+
         figure = make_plots(tmp116_csv)
         canvas = FigureCanvasTkAgg(figure, self)
         canvas.draw()
         canvas.get_tk_widget().place(x=100, y=150)
+
+        data = pd.read_csv(tmp116_csv, names=headers)
+        average = str(round(data['Vrijednost'].mean(), 4))
+        average_message = 'Prosječna vrijednost temperature: ' + average + ' °C'
+        avg_label = tk.Label(self, text=average_message)
+        avg_label.place(x=100, y=600)
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -118,15 +159,15 @@ class TMP116Page(tk.Frame):
         button = tk.Button(self, text="Nazad", command=lambda: controller.show_frame(StartPage))
         button.pack()
 
-        TMP116Page.update_plots(self)
+        TMP116Page.update_data(self)
 
-        button_update = tk.Button(self, text="Ažuriraj", command=lambda: TMP116Page.update_plots(self))
+        button_update = tk.Button(self, text="Ažuriraj", command=lambda: TMP116Page.update_data(self))
         button_update.place(x=100, y=20)
 
 
 class HDC2010Page(tk.Frame):
 
-    def update_plots(self):
+    def update_data(self):
         figure = make_plots(hdc2010_temp_csv)
         canvas = FigureCanvasTkAgg(figure, self)
         canvas.draw()
@@ -137,6 +178,18 @@ class HDC2010Page(tk.Frame):
         canvas.draw()
         canvas.get_tk_widget().place(x=650, y=150)
 
+        data = pd.read_csv(hdc2010_temp_csv, names=headers)
+        average = str(round(data['Vrijednost'].mean(), 4))
+        average_message = 'Prosječna vrijednost temperature: ' + average + ' °C'
+        avg_temp_label = tk.Label(self, text=average_message)
+        avg_temp_label.place(x=100, y=600)
+
+        data = pd.read_csv(hdc2010_hum_csv, names=headers)
+        average = str(round(data['Vrijednost'].mean(), 4))
+        average_message = 'Prosječna vrijednost vlažnosti zraka: ' + average + '%'
+        avg_hum_label = tk.Label(self, text=average_message)
+        avg_hum_label.place(x=100, y=625)
+
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         label = tk.Label(self, text="HDC 2010", font=LARGE_FONT)
@@ -145,19 +198,25 @@ class HDC2010Page(tk.Frame):
         button = tk.Button(self, text="Nazad", command=lambda: controller.show_frame(StartPage))
         button.pack()
 
-        HDC2010Page.update_plots(self)
+        HDC2010Page.update_data(self)
 
-        button_update = tk.Button(self, text="Ažuriraj", command=lambda: HDC2010Page.update_plots(self))
+        button_update = tk.Button(self, text="Ažuriraj", command=lambda: HDC2010Page.update_data(self))
         button_update.place(x=100, y=20)
 
 
 class OPT3001Page(tk.Frame):
 
-    def update_plots(self):
+    def update_data(self):
         figure = make_plots(opt3001_csv)
         canvas = FigureCanvasTkAgg(figure, self)
         canvas.draw()
         canvas.get_tk_widget().place(x=100, y=150)
+
+        data = pd.read_csv(opt3001_csv, names=headers)
+        average = str(round(data['Vrijednost'].mean(), 4))
+        average_message = 'Prosječna vrijednost intenziteta svjetlosti: ' + average + ' lux'
+        avg_temp_label = tk.Label(self, text=average_message)
+        avg_temp_label.place(x=100, y=600)
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -167,15 +226,15 @@ class OPT3001Page(tk.Frame):
         button = tk.Button(self, text="Nazad", command=lambda: controller.show_frame(StartPage))
         button.pack()
 
-        OPT3001Page.update_plots(self)
+        OPT3001Page.update_data(self)
 
-        button_update = tk.Button(self, text="Ažuriraj", command=lambda: OPT3001Page.update_plots(self))
+        button_update = tk.Button(self, text="Ažuriraj", command=lambda: OPT3001Page.update_data(self))
         button_update.place(x=100, y=20)
 
 
 class DPS301Page(tk.Frame):
 
-    def update_plots(self):
+    def update_data(self):
         figure = make_plots(dps310_temp_csv)
         canvas = FigureCanvasTkAgg(figure, self)
         canvas.draw()
@@ -186,6 +245,18 @@ class DPS301Page(tk.Frame):
         canvas.draw()
         canvas.get_tk_widget().place(x=650, y=150)
 
+        data = pd.read_csv(dps310_temp_csv, names=headers)
+        average = str(round(data['Vrijednost'].mean(), 4))
+        average_message = 'Prosječna vrijednost temperature: ' + average + ' °C'
+        avg_temp_label = tk.Label(self, text=average_message)
+        avg_temp_label.place(x=100, y=600)
+
+        data = pd.read_csv(dps310_pressure_csv, names=headers)
+        average = str(round(data['Vrijednost'].mean(), 4))
+        average_message = 'Prosječna vrijednost tlaka: ' + average + ' Pa'
+        avg_pres_label = tk.Label(self, text=average_message)
+        avg_pres_label.place(x=100, y=625)
+
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         label = tk.Label(self, text="DPS301", font=LARGE_FONT)
@@ -194,9 +265,9 @@ class DPS301Page(tk.Frame):
         button = tk.Button(self, text="Nazad", command=lambda: controller.show_frame(StartPage))
         button.pack()
 
-        DPS301Page.update_plots(self)
+        DPS301Page.update_data(self)
 
-        button_update = tk.Button(self, text="Ažuriraj", command=lambda: DPS301Page.update_plots(self))
+        button_update = tk.Button(self, text="Ažuriraj", command=lambda: DPS301Page.update_data(self))
         button_update.place(x=100, y=20)
 
 
@@ -206,7 +277,6 @@ class StartPage(tk.Frame):
         tk.Frame.__init__(self, parent)
         label = tk.Label(self, text="Start Page", font=LARGE_FONT)
         label.pack(pady=10, padx=10)
-        # tmp_page = TMP116Page(self)
 
         button_tmp = tk.Button(self, text="TMP116 očitanja", command=lambda: controller.show_frame(TMP116Page))
         button_tmp.pack()
@@ -251,17 +321,16 @@ class SensorCentral(tk.Tk):
 
 def thread_gui():
     app = SensorCentral()
-    # app.after(1, store_to_csv())
     app.mainloop()
 
 
 if __name__ == '__main__':
+    folder_prep()
     serial = serial.Serial('COM4', 19200, timeout=1)
     serial.reset_input_buffer()
     time.sleep(2)
     threading.Thread(target=thread_gui).start()
-    # thread.start_new_thread(thread_gui(), ())
 
-    while 1:
+    while True:
         store_to_csv()
         time.sleep(1)
