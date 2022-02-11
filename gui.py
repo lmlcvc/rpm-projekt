@@ -41,7 +41,16 @@ light_string = 'razine svjetlosti'
 light_measurement = ' lux'
 pressure_string = 'atmosferskog tlaka'
 pressure_measurement = 'Pa'
+colors = ['r', 'g', 'b']
 
+TEMP_MIN = 17
+TEMP_MAX = 25
+HUM_MIN = 30
+HUM_MAX = 60
+LUX_MIN = 50
+LUX_MAX = 900
+PRES_MIN = 100000
+PRES_MAX = 101400
 
 def folder_prep():
     if not os.path.exists(csv_folder):
@@ -81,20 +90,29 @@ def impl_circular_buffer(path):
     return
 
 
-def make_plots(filepath):
-    with open(filepath) as f:
+def make_plots(filepaths, figsize=None, def_color_idx=-1):
+    if figsize is None:
+        figsize = (5, 4)
+
+    for filepath in filepaths:
         wait_for_file_input(filepath)
         impl_circular_buffer(filepath)
 
-        df = pd.read_csv(f, names=headers)
-        print(df.get('Vrijednost'))
-        print(df)
-        figure = plt.Figure(figsize=(5, 4), dpi=100)
-        ax = figure.add_subplot(111)
-        # line = FigureCanvasTkAgg(figure, app)
-        # line.get_tk_widget().pack(side=tk.LEFT, fill=tk.BOTH)
-        df.plot(kind='line', legend=True, ax=ax, color='r', marker='o', fontsize=10)
-        ax.set_title(df[headers[1]][0] + ' ' + df[headers[2]][0])
+    df_list = [pd.read_csv(filepath, names=headers) for filepath in filepaths]
+    print(filepaths, figsize)
+    figure = plt.Figure(figsize=figsize, dpi=100)
+    ax = figure.add_subplot(111)
+    # line = FigureCanvasTkAgg(figure, app)
+    # line.get_tk_widget().pack(side=tk.LEFT, fill=tk.BOTH)
+    for i in range(len(df_list)):
+        # TODO: znam zašto radi ali je ružno
+        if def_color_idx == -1:
+            color_idx = i
+        else:
+            color_idx = def_color_idx
+        df_list[i].plot(kind='line', legend=True, ax=ax, color=colors[color_idx], fontsize=10)
+    # ax.set_title(SENZOR + VRIJEDNOST)
+
     return figure
 
 
@@ -135,7 +153,7 @@ class SensorPage(tk.Frame):
     def update_data(self, files, values, measures):
         file_num = 0
         for file in files:
-            figure = make_plots(file)
+            figure = make_plots([file])
             canvas = FigureCanvasTkAgg(figure, self)
             canvas.draw()
             canvas.get_tk_widget().place(x=graph_coords[file_num][0], y=graph_coords[file_num][1])
@@ -223,6 +241,9 @@ class DPS301Page(SensorPage):
 
 class StartPage(tk.Frame):
 
+    # TODO: update grafova na početnoj strani
+    # TODO: općenito - nazivi grafova, legende
+
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         label = tk.Label(self, text="Start Page", font=LARGE_FONT)
@@ -239,6 +260,26 @@ class StartPage(tk.Frame):
 
         button_dps = tk.Button(self, text="DPS301 očitanja", command=lambda: controller.show_frame(DPS301Page))
         button_dps.pack()
+
+        figure = make_plots([tmp116_csv, hdc2010_temp_csv, dps310_temp_csv], (3, 3))
+        canvas = FigureCanvasTkAgg(figure, self)
+        canvas.draw()
+        canvas.get_tk_widget().place(x=100, y=250)
+
+        figure = make_plots([hdc2010_hum_csv], (3, 3))
+        canvas = FigureCanvasTkAgg(figure, self)
+        canvas.draw()
+        canvas.get_tk_widget().place(x=400, y=250)
+
+        figure = make_plots([opt3001_csv], (3, 3))
+        canvas = FigureCanvasTkAgg(figure, self)
+        canvas.draw()
+        canvas.get_tk_widget().place(x=700, y=250)
+
+        figure = make_plots([dps310_pressure_csv], (3, 3))
+        canvas = FigureCanvasTkAgg(figure, self)
+        canvas.draw()
+        canvas.get_tk_widget().place(x=1000, y=250)
 
 
 class SensorCentral(tk.Tk):
