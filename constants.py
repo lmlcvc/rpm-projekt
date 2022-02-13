@@ -34,6 +34,40 @@ light_measurement = ' lux'
 pressure_string = 'atmosferskog tlaka'
 pressure_measurement = 'Pa'
 
+low_temp_msg = 'Hladno je. '
+low_temp_tip = 'Upalite grijanje. '
+normal_temp_msg = 'Temperatura je ugodna. '
+high_temp_msg = 'Vruće je. '
+high_temp_tip = 'Upalite hlađenje. '
+low_hum_msg = 'Vlažnost zraka je niska. '
+
+messages = {'low_temp': 'Hladno je. ',
+            'low_temp_tip': 'Upalite grijanje. ',
+            'normal_temp': 'Temperatura je ugodna. ',
+            'high_temp': 'Vruće je. ',
+            'high_temp_tip': 'Upalite hlađenje. ',
+            'low_hum': 'Vlažnost zraka je niska. ',
+            'low_hum_tip': 'Upalite ovlaživač zraka. ',
+            'normal_hum': 'Vlažnost zraka je normalna.',
+            'high_hum': 'Vlažnost zraka je visoka. ',
+            'high_hum_tip': 'Pokušajte prozračiti prostoriju. ',
+            'low_light': 'Premračno je. ',
+            'low_light_tip': 'Otvorite škure ili upalite svjetlo. ',
+            'normal_light': 'Razina svjetlosti je dobra. ',
+            'high_light': 'Razina svjetlosti je visoka. ',
+            'high_light_tip': 'Zamračite prostoriju. ',
+            'low_pressure': 'Atmosferski tlak je nizak. ',
+            'low_pressure_tip': 'Mogli biste očekivati kišno vrijeme. ',
+            'normal pressure': 'Atmosferski tlak je ugodan. ',
+            'high_pressure': 'Atmosferski tlak je visok. ',
+            'high_pressure_tip': 'Vrijeme će biti vedro i suho. '}
+
+messages_low = {key: messages[key]
+                for key in ['low_temp', 'low_hum', 'low_light', 'low_pressure']}
+
+messages_high = {key: messages[key]
+                 for key in ['high_temp', 'high_hum', 'high_light', 'high_pressure']}
+
 # Visual
 colors = ['r', 'g', 'b']
 

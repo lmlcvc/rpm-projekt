@@ -77,6 +77,66 @@ def make_plots(filepaths, figsize=None, def_color_idx=-1):
     return figure
 
 
+# TODO: optimizirati ovo?
+# TODO: Tu možemo napraviti da vraća i boju ako je vrijednost van granica normale.
+    # U tom slučaju funkcija može vraćati tuple (label text, boja) koji se onda koristi u pageu
+def construct_labels(temp=None, humidity=None, light=None, pressure=None, tips_wanted=False):
+    label = ''
+    if temp is not None and temp < TEMP_MIN:
+        label += messages['low_temp']
+        if tips_wanted:
+            label += messages['low_temp_tip']
+    elif temp is not None and TEMP_MIN < temp < TEMP_MAX:
+        label += messages['normal_temp']
+    elif temp is not None and temp > TEMP_MAX:
+        label += messages['high_temp']
+        if tips_wanted:
+            label += messages['high_temp_tip']
+    if temp is not None:
+        label += '\n'
+
+    if humidity is not None and humidity < HUM_MIN:
+        label += messages['low_hum']
+        if tips_wanted:
+            label += messages['low_hum_tip']
+    elif humidity is not None and HUM_MIN < humidity < HUM_MAX:
+        label += messages['normal_hum']
+    elif humidity is not None and humidity > HUM_MAX:
+        label += messages['high_hum']
+        if tips_wanted:
+            label += messages['high_hum_tip']
+    if humidity is not None:
+        label += '\n'
+
+    if light is not None and light < LUX_MIN:
+        label += messages['low_light']
+        if tips_wanted:
+            label += messages['low_light_tip']
+    elif light is not None and LUX_MIN < light < LUX_MAX:
+        label += messages['normal_light']
+    elif light is not None and light > LUX_MAX:
+        label += messages['high_light']
+        if tips_wanted:
+            label += messages['high_light_tip']
+    if light is not None:
+        label += '\n'
+
+    if pressure is not None and pressure < LUX_MIN:
+        label += messages['low_pressure']
+        if tips_wanted:
+            label += messages['low_pressure_tip']
+    elif pressure is not None and LUX_MIN < pressure < LUX_MAX:
+        label += messages['normal_pressure']
+    elif pressure is not None and pressure > LUX_MAX:
+        label += messages['high_pressure']
+        if tips_wanted:
+            label += messages['high_pressure_tip']
+    if pressure is not None:
+        label += '\n'
+
+    return label
+
+
 def store_to_csv():
     with open(tmp116_csv, 'a', newline='') as tmp116_file, \
             open(hdc2010_temp_csv, 'a', newline='') as hdc2010_temp_file, \
@@ -154,6 +214,10 @@ class TMP116Page(SensorPage):
         ))
         button_update.place(x=100, y=20)
 
+        value = pd.read_csv(tmp116_csv, names=headers).iloc[-1]['Vrijednost']
+        indicator_label = tk.Label(self, text=construct_labels(temp=value, tips_wanted=True))
+        indicator_label.place(x=100, y=650)
+
 
 class HDC2010Page(SensorPage):
 
@@ -170,6 +234,14 @@ class HDC2010Page(SensorPage):
                                                                          [temp_measurement, hum_measurement]))
         button_update.place(x=100, y=20)
 
+        value = pd.read_csv(hdc2010_temp_csv, names=headers).iloc[-1]['Vrijednost']
+        indicator_label = tk.Label(self, text=construct_labels(temp=value, tips_wanted=True))
+        indicator_label.place(x=100, y=650)
+
+        value = pd.read_csv(hdc2010_hum_csv, names=headers).iloc[-1]['Vrijednost']
+        indicator_label = tk.Label(self, text=construct_labels(humidity=value, tips_wanted=True))
+        indicator_label.place(x=100, y=675)
+
 
 class OPT3001Page(SensorPage):
 
@@ -182,6 +254,10 @@ class OPT3001Page(SensorPage):
         button_update = tk.Button(self, text="Ažuriraj", command=lambda: SensorPage.update_data(
             self, [opt3001_csv], [light_string], [light_measurement]))
         button_update.place(x=100, y=20)
+
+        value = pd.read_csv(opt3001_csv, names=headers).iloc[-1]['Vrijednost']
+        indicator_label = tk.Label(self, text=construct_labels(light=value, tips_wanted=True))
+        indicator_label.place(x=100, y=650)
 
 
 class DPS301Page(SensorPage):
@@ -199,11 +275,19 @@ class DPS301Page(SensorPage):
                                                                          [temp_measurement, pressure_measurement]))
         button_update.place(x=100, y=20)
 
+        value = pd.read_csv(dps310_temp_csv, names=headers).iloc[-1]['Vrijednost']
+        indicator_label = tk.Label(self, text=construct_labels(temp=value, tips_wanted=True))
+        indicator_label.place(x=100, y=650)
+
+        value = pd.read_csv(dps310_pressure_csv, names=headers).iloc[-1]['Vrijednost']
+        indicator_label = tk.Label(self, text=construct_labels(pressure=value, tips_wanted=True))
+        indicator_label.place(x=100, y=675)
+
 
 class StartPage(tk.Frame):
 
     # TODO: update grafova na početnoj strani
-    # TODO: općenito - nazivi grafova, legende
+    # TODO: općenito - nazivi grafova, legende, boje
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
