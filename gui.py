@@ -294,23 +294,7 @@ class StartPage(tk.Frame):
     # TODO: update grafova na početnoj strani
     # TODO: općenito - nazivi grafova, legende, boje
 
-    def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text="Start Page", font=LARGE_FONT)
-        label.pack(pady=10, padx=10)
-
-        button_tmp = tk.Button(self, text="TMP116 očitanja", command=lambda: controller.show_frame(TMP116Page))
-        button_tmp.pack()
-
-        button_hdc = tk.Button(self, text="HDC2010 očitanja", command=lambda: controller.show_frame(HDC2010Page))
-        button_hdc.pack()
-
-        button_opt = tk.Button(self, text="OPT3001 očitanja", command=lambda: controller.show_frame(OPT3001Page))
-        button_opt.pack()
-
-        button_dps = tk.Button(self, text="DPS301 očitanja", command=lambda: controller.show_frame(DPS301Page))
-        button_dps.pack()
-
+    def update_start_data(self):
         figure = make_plots([tmp116_csv, hdc2010_temp_csv, dps310_temp_csv], (3, 3))
         canvas = FigureCanvasTkAgg(figure, self)
         canvas.draw()
@@ -330,6 +314,47 @@ class StartPage(tk.Frame):
         canvas = FigureCanvasTkAgg(figure, self)
         canvas.draw()
         canvas.get_tk_widget().place(x=1000, y=250)
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        label = tk.Label(self, text="Start Page", font=LARGE_FONT)
+        label.pack(pady=10, padx=10)
+        StartPage.update_start_data(self)
+
+        button_tmp = tk.Button(self, text="TMP116 očitanja", command=lambda: controller.show_frame(TMP116Page))
+        button_tmp.pack()
+
+        button_hdc = tk.Button(self, text="HDC2010 očitanja", command=lambda: controller.show_frame(HDC2010Page))
+        button_hdc.pack()
+
+        button_opt = tk.Button(self, text="OPT3001 očitanja", command=lambda: controller.show_frame(OPT3001Page))
+        button_opt.pack()
+
+        button_dps = tk.Button(self, text="DPS301 očitanja", command=lambda: controller.show_frame(DPS301Page))
+        button_dps.pack()
+
+        button_update = tk.Button(self, text="Ažuriraj", command=lambda: StartPage.update_start_data(self))
+        button_update.place(x=100, y=20)
+
+        """figure = make_plots([tmp116_csv, hdc2010_temp_csv, dps310_temp_csv], (3, 3))
+        canvas = FigureCanvasTkAgg(figure, self)
+        canvas.draw()
+        canvas.get_tk_widget().place(x=100, y=250)
+
+        figure = make_plots([hdc2010_hum_csv], (3, 3))
+        canvas = FigureCanvasTkAgg(figure, self)
+        canvas.draw()
+        canvas.get_tk_widget().place(x=400, y=250)
+
+        figure = make_plots([opt3001_csv], (3, 3))
+        canvas = FigureCanvasTkAgg(figure, self)
+        canvas.draw()
+        canvas.get_tk_widget().place(x=700, y=250)
+
+        figure = make_plots([dps310_pressure_csv], (3, 3))
+        canvas = FigureCanvasTkAgg(figure, self)
+        canvas.draw()
+        canvas.get_tk_widget().place(x=1000, y=250)"""
 
         temp_value = round(np.average([pd.read_csv(tmp116_csv, names=headers)['Vrijednost'].iloc[-1],
                                        pd.read_csv(hdc2010_temp_csv, names=headers)['Vrijednost'].iloc[-1],
