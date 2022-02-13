@@ -34,17 +34,16 @@ def wait_for_file_input(filepath):
 
 # Read file and remove oldest redundant records
 def impl_circular_buffer(path):
+# TODO: budući da je ovo csv, sigurno postoji neka pametnija pandas metoda za saznat koliko ima redova
     with open(path, 'r') as file:
         lines = []
         for row in file.readlines():
             lines.append(row)
         num_rows = len(lines)
-        print(lines, num_rows)
     file.close()
 
     if num_rows > MAX_ROWS:
         extra_rows = num_rows - MAX_ROWS
-        print(extra_rows)
         with open(path, 'w') as file:
             file.writelines(lines[:1] + lines[(extra_rows + 1):])
     file.close()
@@ -60,7 +59,6 @@ def make_plots(filepaths, figsize=None, def_color_idx=-1):
         impl_circular_buffer(filepath)
 
     df_list = [pd.read_csv(filepath, names=headers) for filepath in filepaths]
-    print(filepaths, figsize)
     figure = plt.Figure(figsize=figsize, dpi=100)
     ax = figure.add_subplot(111)
     # line = FigureCanvasTkAgg(figure, app)
@@ -186,6 +184,13 @@ class SensorPage(tk.Frame):
                               + average + measures[file_num]
             avg_label = tk.Label(self, text=average_message)
             avg_label.place(x=text_coords[file_num][0], y=text_coords[file_num][1])
+
+            current = str(data['Vrijednost'].iloc[-1])
+            current_message = 'Trenutna vrijednost ' \
+                              + values[file_num] + ': ' \
+                              + current + measures[file_num]
+            current_label = tk.Label(self, text=current_message)
+            current_label.place(x=current_coords[file_num][0], y=current_coords[file_num][1])
 
             file_num += 1
 

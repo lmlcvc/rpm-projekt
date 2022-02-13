@@ -23,6 +23,7 @@ APP_NAME = 'Centrala za upravljanje pametnim stanom'
 # Coordinates arrays - allow element coordinates depend on number of elements in frame
 graph_coords = [[100, 150], [650, 150]]
 text_coords = [[100, 600], [100, 625]]
+current_coords = [[100, 550], [100, 575]]
 
 # String formation
 temp_string = 'temperature'
