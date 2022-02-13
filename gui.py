@@ -7,6 +7,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd
 import serial
+import numpy as np
 from constants import *
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
@@ -34,7 +35,7 @@ def wait_for_file_input(filepath):
 
 # Read file and remove oldest redundant records
 def impl_circular_buffer(path):
-# TODO: budući da je ovo csv, sigurno postoji neka pametnija pandas metoda za saznat koliko ima redova
+    # TODO: budući da je ovo csv, sigurno postoji neka pametnija pandas metoda za saznat koliko ima redova
     with open(path, 'r') as file:
         lines = []
         for row in file.readlines():
@@ -76,10 +77,10 @@ def make_plots(filepaths, figsize=None, def_color_idx=-1):
 
 
 # TODO: optimizirati ovo?
-# TODO: Tu možemo napraviti da vraća i boju ako je vrijednost van granica normale.
-    # U tom slučaju funkcija može vraćati tuple (label text, boja) koji se onda koristi u pageu
 def construct_labels(temp=None, humidity=None, light=None, pressure=None, tips_wanted=False):
     label = ''
+    if temp is not None:
+        label += f'{temp} °C - '
     if temp is not None and temp < TEMP_MIN:
         label += messages['low_temp']
         if tips_wanted:
@@ -93,6 +94,8 @@ def construct_labels(temp=None, humidity=None, light=None, pressure=None, tips_w
     if temp is not None:
         label += '\n'
 
+    if humidity is not None:
+        label += f'{humidity}% - '
     if humidity is not None and humidity < HUM_MIN:
         label += messages['low_hum']
         if tips_wanted:
@@ -106,6 +109,8 @@ def construct_labels(temp=None, humidity=None, light=None, pressure=None, tips_w
     if humidity is not None:
         label += '\n'
 
+    if light is not None:
+        label += f'{light} lux - '
     if light is not None and light < LUX_MIN:
         label += messages['low_light']
         if tips_wanted:
@@ -119,6 +124,8 @@ def construct_labels(temp=None, humidity=None, light=None, pressure=None, tips_w
     if light is not None:
         label += '\n'
 
+    if pressure is not None:
+        label += f'{pressure} Pa - '
     if pressure is not None and pressure < LUX_MIN:
         label += messages['low_pressure']
         if tips_wanted:
@@ -184,13 +191,6 @@ class SensorPage(tk.Frame):
                               + average + measures[file_num]
             avg_label = tk.Label(self, text=average_message)
             avg_label.place(x=text_coords[file_num][0], y=text_coords[file_num][1])
-
-            current = str(data['Vrijednost'].iloc[-1])
-            current_message = 'Trenutna vrijednost ' \
-                              + values[file_num] + ': ' \
-                              + current + measures[file_num]
-            current_label = tk.Label(self, text=current_message)
-            current_label.place(x=current_coords[file_num][0], y=current_coords[file_num][1])
 
             file_num += 1
 
@@ -330,6 +330,16 @@ class StartPage(tk.Frame):
         canvas = FigureCanvasTkAgg(figure, self)
         canvas.draw()
         canvas.get_tk_widget().place(x=1000, y=250)
+
+        temp_value = round(np.average([pd.read_csv(tmp116_csv, names=headers)['Vrijednost'].iloc[-1],
+                                       pd.read_csv(hdc2010_temp_csv, names=headers)['Vrijednost'].iloc[-1],
+                                       pd.read_csv(dps310_temp_csv, names=headers)['Vrijednost'].iloc[-1]]), 4)
+        hum_value = pd.read_csv(hdc2010_hum_csv, names=headers)['Vrijednost'].iloc[-1]
+        light_value = pd.read_csv(opt3001_csv, names=headers)['Vrijednost'].iloc[-1]
+        pressure_value = pd.read_csv(dps310_pressure_csv, names=headers)['Vrijednost'].iloc[-1]
+        indicator_label = tk.Label(self, text=construct_labels(temp=temp_value, humidity=hum_value, light=light_value,
+                                                               pressure=pressure_value, tips_wanted=True))
+        indicator_label.place(x=100, y=675)
 
 
 class SensorCentral(tk.Tk):
