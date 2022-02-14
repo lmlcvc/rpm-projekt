@@ -1,4 +1,7 @@
 from gui import *
+import matplotlib
+
+matplotlib.use("TkAgg")
 
 
 class SensorPage(tk.Frame):
@@ -141,6 +144,16 @@ class StartPage(tk.Frame):
         canvas.draw()
         canvas.get_tk_widget().place(x=1000, y=250)
 
+        temp_value = round(np.average([pd.read_csv(tmp116_csv, names=headers)['Vrijednost'].iloc[-1],
+                                       pd.read_csv(hdc2010_temp_csv, names=headers)['Vrijednost'].iloc[-1],
+                                       pd.read_csv(dps310_temp_csv, names=headers)['Vrijednost'].iloc[-1]]), 4)
+        hum_value = pd.read_csv(hdc2010_hum_csv, names=headers)['Vrijednost'].iloc[-1]
+        light_value = pd.read_csv(opt3001_csv, names=headers)['Vrijednost'].iloc[-1]
+        pressure_value = pd.read_csv(dps310_pressure_csv, names=headers)['Vrijednost'].iloc[-1]
+        indicator_label = tk.Label(self, text=construct_labels(temp=temp_value, humidity=hum_value, light=light_value,
+                                                               pressure=pressure_value, tips_wanted=True))
+        indicator_label.place(x=100, y=675)
+
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         label = tk.Label(self, text="Start Page", font=LARGE_FONT)
@@ -161,13 +174,3 @@ class StartPage(tk.Frame):
 
         button_update = tk.Button(self, text="Ažuriraj", command=lambda: StartPage.update_start_data(self))
         button_update.place(x=100, y=20)
-
-        temp_value = round(np.average([pd.read_csv(tmp116_csv, names=headers)['Vrijednost'].iloc[-1],
-                                       pd.read_csv(hdc2010_temp_csv, names=headers)['Vrijednost'].iloc[-1],
-                                       pd.read_csv(dps310_temp_csv, names=headers)['Vrijednost'].iloc[-1]]), 4)
-        hum_value = pd.read_csv(hdc2010_hum_csv, names=headers)['Vrijednost'].iloc[-1]
-        light_value = pd.read_csv(opt3001_csv, names=headers)['Vrijednost'].iloc[-1]
-        pressure_value = pd.read_csv(dps310_pressure_csv, names=headers)['Vrijednost'].iloc[-1]
-        indicator_label = tk.Label(self, text=construct_labels(temp=temp_value, humidity=hum_value, light=light_value,
-                                                               pressure=pressure_value, tips_wanted=True))
-        indicator_label.place(x=100, y=675)

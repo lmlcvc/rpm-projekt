@@ -12,6 +12,7 @@ from constants import *
 from pages import *
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
+
 matplotlib.use("TkAgg")
 
 
@@ -189,14 +190,10 @@ class SensorCentral(tk.Tk):
         container.grid_columnconfigure(0, weight=1)
 
         self.frames = {}
-
-        for F in [StartPage, TMP116Page, HDC2010Page, OPT3001Page, DPS301Page]:
-            frame = F(container, self)
-
-            self.frames[F] = frame
-
+        for page in [StartPage, TMP116Page, HDC2010Page, OPT3001Page, DPS301Page]:
+            frame = page(container, self)
+            self.frames[page] = frame
             frame.grid(row=0, column=0, sticky="nsew")
-
         self.show_frame(StartPage)
 
     def show_frame(self, cont):
