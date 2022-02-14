@@ -1,3 +1,24 @@
+"""Gui
+
+This file contains methods used in app, and the main method which starts the GUI and serial communication.
+
+Running both simultaneously makes use of multithreading. A separate thread is started to run the app.
+This allows for all values to be updatable.
+
+This file is the starting point of the app. It creates the folder and files sensor readings will be stored into,
+starts serial communication with the Arduino Micro, and starts the app.
+It also defines all methods necessary for runtime app use.
+
+This file can also be imported as a module and contains the following
+functions:
+    * folder_prep - makes CSV folder and/or files on specified location, if necessary
+    * wait_for_file_input - waits for file to be not-empty before making plots
+    * impl_circular_buffer - treats each sensor's CSV as a circular buffer with MAX_ROWS size
+    * make_plots - returns a figure based on data from passed csv file
+    * construct_labels - constructs labels based on current value; can include tips as well
+    * store_to_csv - listens to serial port and writes values to appropriate CSV files
+"""
+
 import os
 import threading
 import time
@@ -7,10 +28,8 @@ import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd
 import serial
-import numpy as np
 from constants import *
-from pages import *
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import pages as pg
 
 
 matplotlib.use("TkAgg")
@@ -190,11 +209,11 @@ class SensorCentral(tk.Tk):
         container.grid_columnconfigure(0, weight=1)
 
         self.frames = {}
-        for page in [StartPage, TMP116Page, HDC2010Page, OPT3001Page, DPS301Page]:
+        for page in [pg.StartPage, pg.TMP116Page, pg.HDC2010Page, pg.OPT3001Page, pg.DPS310Page]:
             frame = page(container, self)
             self.frames[page] = frame
             frame.grid(row=0, column=0, sticky="nsew")
-        self.show_frame(StartPage)
+        self.show_frame(pg.StartPage)
 
     def show_frame(self, cont):
         frame = self.frames[cont]
