@@ -190,7 +190,8 @@ class DPS310Page(SensorPage):
 
 class StartPage(tk.Frame):
     # TODO: update grafova na početnoj strani
-    # TODO: općenito - nazivi grafova, legende, boje
+    # TODO: općenito - nazivi grafova, legende, boje, vrijeme očitanja
+        # Što ako app ne npr. ne radi 3 sata? Kako to prikazati na grafu?
     # TODO: jel trebamo i tu ispisivati prosječne vrijednosti ili je dovoljno trenutne?
 
     """
