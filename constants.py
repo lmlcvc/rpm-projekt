@@ -1,3 +1,9 @@
+"""Constants
+
+This file contains various constants addressed in forming the visual and logical app structure.
+Constants are grouped by type and use.
+"""
+
 import configparser
 
 # File locations from config
