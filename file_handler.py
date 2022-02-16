@@ -82,5 +82,3 @@ def store_to_csv():
                     dps310_temp_file.write(dt_string + ', ' + string)
                 elif split_string[0] == 'DPS310' and split_string[1] == 'pressure':
                     dps310_pressure_file.write(dt_string + ', ' + string)
-
-                print(string)

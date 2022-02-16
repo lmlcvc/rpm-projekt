@@ -22,6 +22,7 @@ matplotlib.use("TkAgg")
 
 
 class SensorCentral(tk.Tk):
+    frames = {}
 
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
@@ -33,7 +34,6 @@ class SensorCentral(tk.Tk):
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
 
-        self.frames = {}
         for page in [pg.StartPage, pg.TMP116Page, pg.HDC2010Page, pg.OPT3001Page, pg.DPS310Page]:
             frame = page(container, self)
             self.frames[page] = frame
@@ -44,10 +44,16 @@ class SensorCentral(tk.Tk):
         frame = self.frames[cont]
         frame.tkraise()
 
+    def timed_update(self):
+        pg.StartPage.update_start_data(self.frames[pg.StartPage])
+
 
 def thread_gui():
     app = SensorCentral()
-    app.mainloop()
+    while True:
+        app.after(ms=60000, func=app.timed_update) # update start page every 60 s
+        app.update_idletasks()
+        app.update()
 
 
 if __name__ == '__main__':
