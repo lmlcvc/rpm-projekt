@@ -5,6 +5,7 @@ Constants are grouped by type and use.
 """
 
 import configparser
+import serial
 
 # File locations from config
 config = configparser.ConfigParser()
@@ -18,6 +19,10 @@ hdc2010_hum_csv = config['hdc2010_hum_csv']
 opt3001_csv = config['opt3001_csv']
 dps310_temp_csv = config['dps310_temp_csv']
 dps310_pressure_csv = config['dps310_pressure_csv']
+
+# Serial communication info
+SERIAL_PORT = 'COM4'
+serial = serial.Serial(SERIAL_PORT, 19200, timeout=1)
 
 # Basic application info
 headers = ['Vrijeme', 'Senzor', 'Velicina', 'Vrijednost']

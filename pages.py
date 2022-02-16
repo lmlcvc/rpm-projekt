@@ -9,7 +9,7 @@ import matplotlib
 import pandas as pd
 import numpy as np
 from constants import *
-import gui
+import element_constructor as ec
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 matplotlib.use("TkAgg")
@@ -62,7 +62,7 @@ class SensorPage(tk.Frame):
 
         file_num = 0
         for file in files:
-            figure = gui.make_plots([file])
+            figure = ec.make_plots([file])
             canvas = FigureCanvasTkAgg(figure, self)
             canvas.draw()
             canvas.get_tk_widget().place(x=graph_coords[file_num][0], y=graph_coords[file_num][1])
@@ -107,7 +107,7 @@ class TMP116Page(SensorPage):
         # Construct informative message depending on the value
         # Place value and message on page as a Label
         value = pd.read_csv(tmp116_csv, names=headers).iloc[-1]['Vrijednost']
-        indicator_label = tk.Label(self, text=gui.construct_labels(temp=value, tips_wanted=True))
+        indicator_label = tk.Label(self, text=ec.construct_labels(temp=value, tips_wanted=True))
         indicator_label.place(x=100, y=650)
 
 
@@ -131,11 +131,11 @@ class HDC2010Page(SensorPage):
         # Construct informative messages depending on the value
         # Place values and messages on page as a Label
         value = pd.read_csv(hdc2010_temp_csv, names=headers).iloc[-1]['Vrijednost']
-        indicator_label = tk.Label(self, text=gui.construct_labels(temp=value, tips_wanted=True))
+        indicator_label = tk.Label(self, text=ec.construct_labels(temp=value, tips_wanted=True))
         indicator_label.place(x=100, y=650)
 
         value = pd.read_csv(hdc2010_hum_csv, names=headers).iloc[-1]['Vrijednost']
-        indicator_label = tk.Label(self, text=gui.construct_labels(humidity=value, tips_wanted=True))
+        indicator_label = tk.Label(self, text=ec.construct_labels(humidity=value, tips_wanted=True))
         indicator_label.place(x=100, y=675)
 
 
@@ -156,7 +156,7 @@ class OPT3001Page(SensorPage):
         # Construct informative message depending on the value
         # Place value and message on page as a Label
         value = pd.read_csv(opt3001_csv, names=headers).iloc[-1]['Vrijednost']
-        indicator_label = tk.Label(self, text=gui.construct_labels(light=value, tips_wanted=True))
+        indicator_label = tk.Label(self, text=ec.construct_labels(light=value, tips_wanted=True))
         indicator_label.place(x=100, y=650)
 
 
@@ -180,18 +180,18 @@ class DPS310Page(SensorPage):
         # Construct informative messages depending on the value
         # Place values and messages on page as a Label
         value = pd.read_csv(dps310_temp_csv, names=headers).iloc[-1]['Vrijednost']
-        indicator_label = tk.Label(self, text=gui.construct_labels(temp=value, tips_wanted=True))
+        indicator_label = tk.Label(self, text=ec.construct_labels(temp=value, tips_wanted=True))
         indicator_label.place(x=100, y=650)
 
         value = pd.read_csv(dps310_pressure_csv, names=headers).iloc[-1]['Vrijednost']
-        indicator_label = tk.Label(self, text=gui.construct_labels(pressure=value, tips_wanted=True))
+        indicator_label = tk.Label(self, text=ec.construct_labels(pressure=value, tips_wanted=True))
         indicator_label.place(x=100, y=675)
 
 
 class StartPage(tk.Frame):
     # TODO: update grafova na početnoj strani
     # TODO: općenito - nazivi grafova, legende, boje, vrijeme očitanja
-        # Što ako app ne npr. ne radi 3 sata? Kako to prikazati na grafu?
+    # Što ako app ne npr. ne radi 3 sata? Kako to prikazati na grafu?
     # TODO: jel trebamo i tu ispisivati prosječne vrijednosti ili je dovoljno trenutne?
 
     """
@@ -223,25 +223,25 @@ class StartPage(tk.Frame):
 
     def update_start_data(self):
         # temperature graph (3 sensors' values)
-        figure = gui.make_plots([tmp116_csv, hdc2010_temp_csv, dps310_temp_csv], (3, 3))
+        figure = ec.make_plots([tmp116_csv, hdc2010_temp_csv, dps310_temp_csv], (3, 3))
         canvas = FigureCanvasTkAgg(figure, self)
         canvas.draw()
         canvas.get_tk_widget().place(x=100, y=250)
 
         # humidity graph
-        figure = gui.make_plots([hdc2010_hum_csv], (3, 3))
+        figure = ec.make_plots([hdc2010_hum_csv], (3, 3))
         canvas = FigureCanvasTkAgg(figure, self)
         canvas.draw()
         canvas.get_tk_widget().place(x=400, y=250)
 
         # light levels graph
-        figure = gui.make_plots([opt3001_csv], (3, 3))
+        figure = ec.make_plots([opt3001_csv], (3, 3))
         canvas = FigureCanvasTkAgg(figure, self)
         canvas.draw()
         canvas.get_tk_widget().place(x=700, y=250)
 
         # atmospheric pressure graph
-        figure = gui.make_plots([dps310_pressure_csv], (3, 3))
+        figure = ec.make_plots([dps310_pressure_csv], (3, 3))
         canvas = FigureCanvasTkAgg(figure, self)
         canvas.draw()
         canvas.get_tk_widget().place(x=1000, y=250)
@@ -253,8 +253,9 @@ class StartPage(tk.Frame):
         hum_value = pd.read_csv(hdc2010_hum_csv, names=headers)['Vrijednost'].iloc[-1]
         light_value = pd.read_csv(opt3001_csv, names=headers)['Vrijednost'].iloc[-1]
         pressure_value = pd.read_csv(dps310_pressure_csv, names=headers)['Vrijednost'].iloc[-1]
-        indicator_label = tk.Label(self, text=gui.construct_labels(temp=temp_value, humidity=hum_value, light=light_value,
-                                                                   pressure=pressure_value, tips_wanted=True))
+        indicator_label = tk.Label(self,
+                                   text=ec.construct_labels(temp=temp_value, humidity=hum_value, light=light_value,
+                                                            pressure=pressure_value, tips_wanted=True))
         indicator_label.place(x=100, y=675)
 
     def __init__(self, parent, controller):
