@@ -107,7 +107,7 @@ class TMP116Page(SensorPage):
         # Construct informative message depending on the value
         # Place value and message on page as a Label
         value = pd.read_csv(tmp116_csv, names=headers).iloc[-1]['Vrijednost']
-        indicator_label = tk.Label(self, text=ec.construct_labels(temp=value, tips_wanted=True))
+        indicator_label = tk.Label(self, text=ec.construct_labels(temp=value))
         indicator_label.place(x=100, y=650)
 
 
@@ -131,11 +131,11 @@ class HDC2010Page(SensorPage):
         # Construct informative messages depending on the value
         # Place values and messages on page as a Label
         value = pd.read_csv(hdc2010_temp_csv, names=headers).iloc[-1]['Vrijednost']
-        indicator_label = tk.Label(self, text=ec.construct_labels(temp=value, tips_wanted=True))
+        indicator_label = tk.Label(self, text=ec.construct_labels(temp=value))
         indicator_label.place(x=100, y=650)
 
         value = pd.read_csv(hdc2010_hum_csv, names=headers).iloc[-1]['Vrijednost']
-        indicator_label = tk.Label(self, text=ec.construct_labels(humidity=value, tips_wanted=True))
+        indicator_label = tk.Label(self, text=ec.construct_labels(humidity=value))
         indicator_label.place(x=100, y=675)
 
 
@@ -156,7 +156,7 @@ class OPT3001Page(SensorPage):
         # Construct informative message depending on the value
         # Place value and message on page as a Label
         value = pd.read_csv(opt3001_csv, names=headers).iloc[-1]['Vrijednost']
-        indicator_label = tk.Label(self, text=ec.construct_labels(light=value, tips_wanted=True))
+        indicator_label = tk.Label(self, text=ec.construct_labels(light=value))
         indicator_label.place(x=100, y=650)
 
 
@@ -180,11 +180,11 @@ class DPS310Page(SensorPage):
         # Construct informative messages depending on the value
         # Place values and messages on page as a Label
         value = pd.read_csv(dps310_temp_csv, names=headers).iloc[-1]['Vrijednost']
-        indicator_label = tk.Label(self, text=ec.construct_labels(temp=value, tips_wanted=True))
+        indicator_label = tk.Label(self, text=ec.construct_labels(temp=value))
         indicator_label.place(x=100, y=650)
 
         value = pd.read_csv(dps310_pressure_csv, names=headers).iloc[-1]['Vrijednost']
-        indicator_label = tk.Label(self, text=ec.construct_labels(pressure=value, tips_wanted=True))
+        indicator_label = tk.Label(self, text=ec.construct_labels(pressure=value))
         indicator_label.place(x=100, y=675)
 
 
