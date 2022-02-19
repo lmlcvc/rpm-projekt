@@ -1,6 +1,6 @@
 # Smart Home Sensor Central
 
-### Project Description
+## Project Description
 This program represents a central for managing a smart home based on various sensor readings.
 From the user's perspective, it is run as a GUI representing real-time sensor readings and their meaning. \
 All readings are gotten through I2C communication with an Arduino Micro device 
@@ -11,7 +11,7 @@ The wiring scheme for this setup is provided in `wiring-scheme.png`.\
 Sensor readings are stored in csv format and used as such throughout the program.
 
 
-### Project structure and usage
+## Project structure and usage
 ##### arduino/projekt/projekt.ino
 The arduino code used for reading all 4 sensors' data. Before running `gui.py`, this
 code should be up and running on your Arduino board. \
@@ -32,6 +32,25 @@ stores values communicated through it accordingly.
 * The other one starts and runs the gui, and makes sure it updates every 10 seconds.
 
 ##### constants.py
+This file stores all the constants used throughout the program, and 
+allows for their easier modification. The constants are grouped by function.\
+If changing anything in the code, you should do it through `constants.py`
+rather than by directly putting numbers and strings into the code.
+
 ##### file_handler.py
+Here you can find methods used for modifying csv files the project works with and 
+the directory they are stored in. App updatability and other runtime functionalities
+rely heavily on data accessed and modified through this module.
+
 ##### pages.py
+This is a file that declares the classes for all pages in the app.
+* `StartPage` - the main page in the app and its starting point
+* `SensorPage` (its child classes) - define pages for each of the sensors in this setup
+
 ##### element_constructor.py
+Various tkinter on the pages are constructed and modified by using this module's methods.
+
+
+## Installing and running
+
+## Credits
