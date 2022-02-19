@@ -3,10 +3,8 @@
 This file contains classes used to construct all pages in app,
 as tk.Frame objects (child classes of tk.Frame).
 """
-import sched
-import threading
+
 import tkinter as tk
-from time import sleep, time
 
 import matplotlib
 import pandas as pd
