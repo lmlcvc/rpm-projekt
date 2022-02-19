@@ -17,9 +17,13 @@ from constants import *
 
 
 def folder_prep():
+    """ Prepare and/or modify folder and file locations for sensor readings. """
+
+    # make csv folder if it doesn't exist
     if not os.path.exists(csv_folder):
         os.makedirs(csv_folder)
 
+    # populate csv folder with specified files if it's empty
     if len(os.listdir(csv_folder)) == 0:
         open(tmp116_csv, 'a').close()
         open(hdc2010_temp_csv, 'a').close()
@@ -30,30 +34,50 @@ def folder_prep():
 
 
 def wait_for_file_input(filepath):
+    """ Wait for file to be non-empty before plotting its data.
+        This is to avoid a possible bug when plotting
+
+        Arguments:
+            filepath - location of the file waiting for input
+    """
+
     while ((os.path.exists(filepath) and os.path.getsize(filepath) == 0)
            or not os.path.exists(filepath)):
         pass
 
 
-# Read file and remove oldest redundant records
-def impl_circular_buffer(path):
-    # TODO: budući da je ovo csv, sigurno postoji neka pametnija pandas metoda za saznat koliko ima redova
-    with open(path, 'r') as file:
+def impl_circular_buffer(filepath, buff_size=MAX_ROWS):
+    """ Treat csv file as a circular buffer.
+
+        Arguments:
+            filepath - location of the file being modified
+            buff_size - size of buffer depending on sampling frequency; default MAX_ROWS
+    """
+
+    # light and pressure measures require higher sampling rates (more records)
+    if (filepath == opt3001_csv) or (filepath == dps310_pressure_csv):
+        buff_size = MAX_ROWS_OPT_PRES
+
+    # open file, store its lines to list
+    with open(filepath, 'r') as file:
         lines = []
         for row in file.readlines():
             lines.append(row)
         num_rows = len(lines)
     file.close()
 
-    if num_rows > MAX_ROWS:
-        extra_rows = num_rows - MAX_ROWS
-        with open(path, 'w') as file:
+    # remove any oldest lines that exceed maximum buffer size and write result to file
+    if num_rows > buff_size:
+        extra_rows = num_rows - buff_size
+        with open(filepath, 'w') as file:
             file.writelines(lines[:1] + lines[(extra_rows + 1):])
     file.close()
     return
 
 
 def store_to_csv():
+    """ Store lines from serial port to respective CSV files. """
+
     with open(tmp116_csv, 'a', newline='') as tmp116_file, \
             open(hdc2010_temp_csv, 'a', newline='') as hdc2010_temp_file, \
             open(hdc2010_hum_csv, 'a', newline='') as hdc2010_hum_file, \
@@ -61,7 +85,7 @@ def store_to_csv():
             open(dps310_temp_csv, 'a', newline='') as dps310_temp_file, \
             open(dps310_pressure_csv, 'a', newline='') as dps310_pressure_file:
 
-        for i in range(NUM_OF_SENSORS):
+        for i in range(NUM_OF_SENSORS):  # TODO: change to while-loop because of different sampling rates
             line = serial.readline()  # read a byte string
 
             now = datetime.now()
@@ -70,6 +94,9 @@ def store_to_csv():
             if line:
                 string = line.decode()  # convert the byte string to a unicode string
                 split_string = string.split(', ')
+
+                # choose write file location based on sensor name and value
+                # add current time to record
                 if split_string[0] == 'TMP116':
                     tmp116_file.write(dt_string + ', ' + string)
                 elif split_string[0] == 'HDC2010' and split_string[1] == 'temperature':
