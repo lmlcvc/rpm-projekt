@@ -3,13 +3,6 @@
 This file contains methods used for construction of visual tkinter elements.
 The return values of its methods are elements to be placed on pages the methods were called from.
 
-It can also be imported as a module and contains the following
-functions:
-    * folder_prep - makes CSV folder and/or files on specified location, if necessary
-    * wait_for_file_input - waits for file to be not-empty before making plots
-    * impl_circular_buffer - treats each sensor's CSV as a circular buffer with MAX_ROWS size
-    * store_to_csv - listens to serial port and writes values to appropriate CSV files
-
 This file can also be imported as a module and contains the following
 functions:
     * make_plots - returns a figure based on data from passed csv file
