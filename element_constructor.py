@@ -19,13 +19,22 @@ functions:
 import pandas as pd
 from matplotlib import pyplot as plt
 
-import gui
 import file_handler as fh
 from constants import *
 
 
 def make_plots(filepaths, figsize=None, def_color_idx=-1):
-    if figsize is None:
+    # TODO: dodati mjernu veličinu na y os, vrijeme prvog i zadnjeg očitanja na x os, bojanje, \
+    #  postaviti legende i naslov grafa
+    """ Return sensor readings plot as a plt.Figure.
+
+        Arguments:
+            filepaths - locations of files whose readings are to be plotted on the figure
+            figsize - size of figure; default (5, 4)
+            def_color_idx - # TODO: define when colouring is modified
+    """
+
+    if figsize is None:  # define default figsize
         figsize = (5, 4)
 
     for filepath in filepaths:
@@ -49,8 +58,17 @@ def make_plots(filepaths, figsize=None, def_color_idx=-1):
     return figure
 
 
-# TODO: optimizirati ovo?
 def construct_labels(temp=None, humidity=None, light=None, pressure=None, tips_wanted=False):
+    """ Construct labels with messages about current values and tips (if wanted).
+
+        Arguments:
+            temp - temperature value in °C (if available)
+            humidity - humidity value in % (if available)
+            light - light value in lux (if available)
+            pressure - pressure value in Pa (if available)
+            tips_wanted - indicate whether to include tips in the message; default - no (False)
+    """
+
     label = ''
     if temp is not None:
         label += f'{temp} °C - '
