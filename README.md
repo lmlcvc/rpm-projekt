@@ -82,5 +82,5 @@ Various tkinter on the pages are constructed and modified by using this module's
 
 ## Credits
 
-All code in `/arduino` is constructed using the help of libraries and examples mentioned
+All code in `/arduino/projekt` is constructed using the help of libraries and examples mentioned
 in [disclaimer](/arduino/disclaimer.md).
