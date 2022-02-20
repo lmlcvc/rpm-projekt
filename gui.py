@@ -9,14 +9,14 @@ This file is the starting point of the app. It creates the folder and files sens
 starts serial communication with the Arduino Micro, and starts the app.
 It also defines all methods necessary for runtime app use.
 """
-
 import threading
 import time
 import tkinter as tk
 import matplotlib
-from constants import *
-import pages as pg
+
 import file_handler as fh
+import pages as pg
+from constants import *
 
 matplotlib.use("TkAgg")
 
@@ -67,16 +67,26 @@ class SensorCentral(tk.Tk):
         pg.StartPage.update_start_data(self.frames[pg.StartPage])
 
 
+def call_repeatedly(interval, func, *args):
+    """ Call func(*args) every {interval} seconds. """
+    stopped = threading.Event()
+
+    def loop():
+        while not stopped.wait(interval):  # the first call is in `interval` secs
+            func(*args)
+
+    threading.Thread(target=loop).start()
+    return stopped.set
+
+
 def thread_gui():
     """ Thread used to start and run the GUI. """
 
     app = SensorCentral()  # start the app
+    cancel_future_calls = call_repeatedly(10, app.timed_update, )  # call for repeated app update
+    app.mainloop()  # enter main app loop after repeated calls instantiated
 
-    # continuously call timed update and run main loop
-    while True:
-        app.after(ms=60000, func=app.timed_update)
-        app.update_idletasks()
-        app.update()
+    cancel_future_calls()  # cancel future calls after window closes
 
 
 if __name__ == '__main__':
