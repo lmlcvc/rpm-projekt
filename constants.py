@@ -24,8 +24,8 @@ dps310_pressure_csv = config['dps310_pressure_csv']
 SERIAL_PORT = config['serial_port']
 try:
     serial = serial.Serial(SERIAL_PORT, 19200, timeout=1)
-except:
-  print(f'Serial port {SERIAL_PORT} unavailable. Connect your device to {SERIAL_PORT} or redefine SERIAL_PORT.')
+except serial.serialutil.SerialException:
+    print(f'Serial port {SERIAL_PORT} unavailable. Connect your device to {SERIAL_PORT} or redefine SERIAL_PORT.')
 
 # Basic application info
 headers = ['Vrijeme', 'Senzor', 'Velicina', 'Vrijednost']
