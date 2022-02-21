@@ -13,6 +13,7 @@ import threading
 import time
 import tkinter as tk
 import matplotlib
+import serial.tools.list_ports
 
 import file_handler as fh
 import pages as pg
@@ -91,10 +92,18 @@ def thread_gui():
 
 if __name__ == '__main__':
     fh.folder_prep()  # prepare csv folder
-    serial.reset_input_buffer()  # clear input serial buffer
+
+    # check if port defined as SERIAL_PORT has a device connected to it
+    ports = [tuple(p)[0] for p in list(serial.tools.list_ports.comports())]
+    arduino_port = [port for port in ports if SERIAL_PORT in port]
+
+    if arduino_port:
+        serial.reset_input_buffer()  # clear input serial buffer
+
     time.sleep(1)  # small delay to stabilise
     threading.Thread(target=thread_gui).start()  # start gui thread
 
-    # continuously store incoming values from serial to csv
-    while True:
-        fh.store_to_csv()
+    # continuously store incoming values from serial to csv if device connected
+    if arduino_port:
+        while True:
+            fh.store_to_csv()
