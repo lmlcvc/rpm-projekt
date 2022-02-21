@@ -4,10 +4,12 @@ This file contains classes used to construct all pages in app,
 as tk.Frame objects (child classes of tk.Frame).
 """
 import tkinter as tk
+from tkinter import messagebox
 
 import matplotlib
 import pandas as pd
 import numpy as np
+import re
 
 from constants import *
 import element_constructor as ec
@@ -15,6 +17,22 @@ import file_handler as fh
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 matplotlib.use("TkAgg")
+
+
+def validate_entries(values):
+    """ Validates entries on Update page and returns True if valid,
+        raises warning messagebox if not.
+    """
+
+    if (float(values['TEMP_MIN']) and float(values['TEMP_MAX'])
+            and float(values['HUM_MIN']) and float(values['HUM_MAX'])
+            and float(values['LUX_MIN']) and float(values['LUX_MAX'])
+            and float(values['PRES_MIN']) and float(values['PRES_MAX'])
+            and re.match("COM[0-9]$", values['SERIAL_PORT'])):
+        return True
+    else:
+        messagebox.showerror('Neispravan unos!', 'Molimo, pokušajte ponovo.')
+    return False
 
 
 class UpdatePage(tk.Frame):
@@ -78,7 +96,8 @@ class UpdatePage(tk.Frame):
                   'PRES_MAX': self.pres_max.get(),
                   'SERIAL_PORT': self.serial_port.get()}
 
-        fh.write_to_config(values)
+        if validate_entries(values):
+            fh.write_to_config(values)
 
     def init_labels(self, page_label):
         label = tk.Label(self, text=page_label, font=LARGE_FONT)
@@ -230,8 +249,8 @@ class SensorPage(tk.Frame):
             # Calculate average value from file and place label accordingly.
             data = pd.read_csv(file, names=headers)
             average = str(round(data['Vrijednost'].mean(), 4))
-            self.average_message.set('Prosječna vrijednost ' \
-                                     + values[file_num] + ': ' \
+            self.average_message.set('Prosječna vrijednost '
+                                     + values[file_num] + ': '
                                      + average + measures[file_num])
             avg_label = tk.Label(self, textvariable=self.average_message)
             avg_label.place(x=text_coords[file_num][0], y=text_coords[file_num][1])
