@@ -172,13 +172,22 @@ class SensorPage(tk.Frame):
 
         Attributes
         ----------
+        average_message : tk.StringVar
+            Variable message about the average value in matching sensor reading buffer.
+
+        current_message : tk.StringVar
+            Variable message about the latest value in matching sensor reading buffer.
+
         graphs : tk.Figure
             Each sensor page contains 1 or 2 graphs for its readings.
             Graph data is stored in csv as a circular buffer.
             Graph figures are drawn using FigureCanvasTkAgg.
 
         average values : tk.Label
-            Average values of sensor readings (from matching csv files).
+            Label(s) containing average_message(s).
+
+        current values : tk.Label
+            Label(s) containing current_message(s).
 
         Methods
         -------
