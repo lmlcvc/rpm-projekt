@@ -3,17 +3,16 @@
 This file contains the app (Tk) class, and the main method which starts the GUI and serial communication.
 
 Running both simultaneously makes use of multithreading.
-A separate thread is started to run the serial communication.
+If serial communication is available, a separate thread is started
+from file_handler.py to run the serial communication.
 
 This file is the starting point of the app. It creates the folder and files sensor readings will be stored into,
 starts serial communication with the Arduino Micro, and starts the app.
 It also defines all methods necessary for runtime app use.
 """
 import threading
-import time
 import tkinter as tk
 import matplotlib
-import serial.tools.list_ports
 
 import file_handler as fh
 import pages as pg
@@ -106,20 +105,7 @@ def thread_serial():
 
 if __name__ == '__main__':
     fh.folder_prep()  # prepare csv folder
-
-    # check if port defined as SERIAL_PORT has a device connected to it
-    ports = [tuple(p)[0] for p in list(serial.tools.list_ports.comports())]
-    arduino_port = [port for port in ports if constants.SERIAL_PORT in port]
-
-    # start serial communication if connected
-    if arduino_port:
-        constants.serial.reset_input_buffer()  # clear input serial buffer
-
-        time.sleep(1)  # small delay to stabilise
-        threading.Thread(target=thread_serial).start()  # start thread
-    else:
-        print(f'Serial port {constants.SERIAL_PORT} unavailable. '
-              f'Connect your device to {constants.SERIAL_PORT} or redefine SERIAL_PORT.')
+    fh.connect_to_serial()  # start serial communication if available
 
     app = SensorCentral()  # start the app
     cancel_future_calls = call_repeatedly(10, app.app_update, )  # call for repeated app update

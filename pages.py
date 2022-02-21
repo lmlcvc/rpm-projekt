@@ -75,7 +75,8 @@ class UpdatePage(tk.Frame):
                   'LUX_MIN': self.light_min.get(),
                   'LUX_MAX': self.light_max.get(),
                   'PRES_MIN': self.pres_min.get(),
-                  'PRES_MAX': self.pres_max.get()}
+                  'PRES_MAX': self.pres_max.get(),
+                  'SERIAL_PORT': self.serial_port.get()}
 
         fh.write_to_config(values)
 

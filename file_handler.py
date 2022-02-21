@@ -8,11 +8,15 @@ methods:
     * wait_for_file_input - waits for file to be not-empty before making plots
     * impl_circular_buffer - treats each sensor's CSV as a circular buffer with MAX_ROWS size
     * store_to_csv - listens to serial port and writes values to appropriate CSV files
-    * write_to_config - updates config.ini when called
+    * write_to_config - updates config.ini (and app functionalities) when called
 """
 import os
+import threading
 from configparser import SafeConfigParser
+import time
 from datetime import datetime
+
+import serial.tools.list_ports
 
 import constants
 import element_constructor as ec
@@ -113,6 +117,33 @@ def store_to_csv():
                     dps310_pressure_file.write(dt_string + ', ' + string)
 
 
+def thread_serial():
+    """ Thread used to continuously store incoming values from serial to csv if device connected """
+
+    while True:
+        store_to_csv()
+
+
+def connect_to_serial():
+    """ Connect to serial port if available. """
+
+    # check if port defined as SERIAL_PORT has a device connected to it
+    ports = [tuple(p)[0] for p in list(serial.tools.list_ports.comports())]
+    arduino_port = [port for port in ports if constants.SERIAL_PORT in port]
+
+    # start serial communication if connected
+    if arduino_port:
+        constants.serial.reset_input_buffer()  # clear input serial buffer
+
+        time.sleep(1)  # small delay to stabilise
+        threading.Thread(target=thread_serial).start()  # start thread
+
+    # if not, print a message to console
+    else:
+        print(f'Serial port {constants.SERIAL_PORT} unavailable. '
+              f'Connect your device to {constants.SERIAL_PORT} or redefine SERIAL_PORT.')
+
+
 def write_to_config(values):
     """ Stores values from Update Page to config.ini.
         Calls for reload of constants.py module where necessary in order to update whole app.
@@ -126,6 +157,8 @@ def write_to_config(values):
     config_parser = SafeConfigParser()
     config_parser.read('config.ini')
 
+    serial_port_old = config_parser['updatable']['serial_port']  # old serial port in case of port reconnection
+
     # set values in [updatable] section to those passed as argument
     for key, value in values.items():
         config_parser.set('updatable', key, value)
@@ -134,5 +167,9 @@ def write_to_config(values):
     with open('config.ini', 'w') as configfile:
         config_parser.write(configfile)
 
-    ec.reload_constants()
-    # TODO: da se proba ponovo spojit na port
+    ec.reload_constants()  # update values (min/max) for element construction
+
+    # if serial port changed, reconnect to new port
+    serial_port_new = config_parser['updatable']['serial_port']
+    if serial_port_old != serial_port_new:
+        connect_to_serial()
