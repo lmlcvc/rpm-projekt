@@ -23,8 +23,6 @@ def reload_constants():
 
 
 def make_plots(filepaths, figsize=None, title=None, unit=None, def_color_idx=-1):
-    # TODO: dodati mjernu veličinu na y os, vrijeme prvog i zadnjeg očitanja na x os, bojanje, \
-    #  postaviti legende i naslov grafa
     """ Return sensor readings plot as a plt.Figure.
 
         Arguments:
@@ -40,28 +38,24 @@ def make_plots(filepaths, figsize=None, title=None, unit=None, def_color_idx=-1)
         fh.wait_for_file_input(filepath)
         fh.impl_circular_buffer(filepath)
 
-    df_list = [pd.read_csv(filepath, names=headers) for filepath in filepaths]
-
-    figure = plt.Figure(figsize=figsize, dpi=100, constrained_layout=True)
     df_list = [pd.read_csv(filepath, names=constants.headers) for filepath in filepaths]
     figure = plt.Figure(figsize=figsize, dpi=100)
     ax = figure.add_subplot(111)
-    # line = FigureCanvasTkAgg(figure, app)
-    # line.get_tk_widget().pack(side=tk.LEFT, fill=tk.BOTH)
+
     for i in range(len(df_list)):
         # TODO: znam zašto radi ali je ružno
         if def_color_idx == -1:
             color_idx = i
         else:
             color_idx = def_color_idx
-        df_list[i].plot(ax=ax, kind='line', color=colors[color_idx], fontsize=10)
+        df_list[i].plot(ax=ax, kind='line', color=constants.colors[color_idx], fontsize=10)
 
     ax.legend([df.Senzor[0] for df in df_list])
     ax.set_title(title)
     ax.set_xticks([])
     ax.set_ylabel(unit, rotation=0)
     ax.set_xlabel('vrijeme', rotation=0)
-    ax.yaxis.set_label_coords(-0.05,1.02)
+    ax.yaxis.set_label_coords(-0.05, 1.02)
 
     return figure
 
@@ -88,58 +82,58 @@ def construct_labels(measure=None, value=None, temp=None, humidity=None, light=N
     if temp is not None and temp < constants.TEMP_MIN:
         label += constants.messages['low_temp']
         if tips_wanted:
-            label += constants.messages['low_temp_tip']
+            label += '\n' + constants.messages['low_temp_tip']
     elif temp is not None and constants.TEMP_MIN < temp < constants.TEMP_MAX:
         label += constants.messages['normal_temp']
     elif temp is not None and temp > constants.TEMP_MAX:
         label += constants.messages['high_temp']
         if tips_wanted:
-            label += constants.messages['high_temp_tip']
+            label += '\n' + constants.messages['high_temp_tip']
     if temp is not None:
-        label += '\n'
+        label += '\n\n'
 
     if humidity is not None:
         label += f'{humidity}% - '
     if humidity is not None and humidity < constants.HUM_MIN:
         label += constants.messages['low_hum']
         if tips_wanted:
-            label += constants.messages['low_hum_tip']
+            label += '\n' + constants.messages['low_hum_tip']
     elif humidity is not None and constants.HUM_MIN < humidity < constants.HUM_MAX:
         label += constants.messages['normal_hum']
     elif humidity is not None and humidity > constants.HUM_MAX:
         label += constants.messages['high_hum']
         if tips_wanted:
-            label += constants.messages['high_hum_tip']
+            label += '\n' + constants.messages['high_hum_tip']
     if humidity is not None:
-        label += '\n'
+        label += '\n\n'
 
     if light is not None:
         label += f'{light} lux - '
     if light is not None and light < constants.LUX_MIN:
         label += constants.messages['low_light']
         if tips_wanted:
-            label += constants.messages['low_light_tip']
+            label += '\n' + constants.messages['low_light_tip']
     elif light is not None and constants.LUX_MIN < light < constants.LUX_MAX:
         label += constants.messages['normal_light']
     elif light is not None and light > constants.LUX_MAX:
         label += constants.messages['high_light']
         if tips_wanted:
-            label += constants.messages['high_light_tip']
+            label += '\n' + constants.messages['high_light_tip']
     if light is not None:
-        label += '\n'
+        label += '\n\n'
 
     if pressure is not None:
         label += f'{pressure} Pa - '
     if pressure is not None and pressure < constants.PRES_MIN:
         label += constants.messages['low_pressure']
         if tips_wanted:
-            label += constants.messages['low_pressure_tip']
+            label += '\n' + constants.messages['low_pressure_tip']
     elif pressure is not None and constants.PRES_MIN < pressure < constants.PRES_MAX:
         label += constants.messages['normal_pressure']
     elif pressure is not None and pressure > constants.PRES_MAX:
         label += constants.messages['high_pressure']
         if tips_wanted:
-            label += constants.messages['high_pressure_tip']
+            label += '\n' + constants.messages['high_pressure_tip']
     if pressure is not None:
         label += '\n'
 

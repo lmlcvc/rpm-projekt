@@ -50,6 +50,7 @@ class SensorCentral(tk.Tk):
 
         tk.Tk.wm_title(self, constants.APP_NAME)
 
+        # make app window as big as screen
         w, h = self.winfo_screenwidth(), self.winfo_screenheight()
         self.geometry("%dx%d+0+0" % (w, h))
 
@@ -72,19 +73,24 @@ class SensorCentral(tk.Tk):
         pg.StartPage.update_start_data(self.frames[pg.StartPage])
 
         pg.TMP116Page.update_data(self.frames[pg.TMP116Page],
-                                  [constants.tmp116_csv], [constants.temp_string], [constants.temp_measurement])
+                                  [constants.tmp116_csv], [constants.temp_string], [constants.temp_measurement],
+                                  [constants.temp_name])
+
         pg.HDC2010Page.update_data(self.frames[pg.HDC2010Page],
                                    [constants.hdc2010_temp_csv, constants.hdc2010_hum_csv],
                                    [constants.temp_string, constants.hum_string],
-                                   [constants.temp_measurement, constants.hum_measurement]
-                                   )
+                                   [constants.temp_measurement, constants.hum_measurement],
+                                   [constants.temp_name, constants.hum_name], 3)
+
         pg.OPT3001Page.update_data(self.frames[pg.OPT3001Page],
-                                   [constants.opt3001_csv], [constants.light_string], [constants.light_measurement])
+                                   [constants.opt3001_csv], [constants.light_string], [constants.light_measurement],
+                                   [constants.light_name], 4)
+
         pg.DPS310Page.update_data(self.frames[pg.DPS310Page],
                                   [constants.dps310_temp_csv, constants.dps310_pressure_csv],
                                   [constants.temp_string, constants.pressure_string],
-                                  [constants.temp_measurement, constants.pressure_measurement]
-                                  )
+                                  [constants.temp_measurement, constants.pressure_measurement],
+                                  [constants.temp_name, constants.pressure_name], 5)
 
 
 def call_repeatedly(interval, func, *args):
@@ -106,6 +112,7 @@ if __name__ == '__main__':
     app = SensorCentral()  # start the app
     cancel_future_calls = call_repeatedly(10, app.app_update, )  # call for repeated app update
     app.iconbitmap(constants.ICON_PATH)  # set app icon
+
     app.mainloop()  # enter main app loop after repeated calls instantiated
 
     cancel_future_calls()  # cancel future calls after window closes

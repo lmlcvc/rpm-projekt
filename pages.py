@@ -12,6 +12,7 @@ import pandas as pd
 import numpy as np
 import re
 
+import constants
 from constants import *
 import element_constructor as ec
 import file_handler as fh
@@ -150,10 +151,10 @@ class UpdatePage(tk.Frame):
 
     def init_buttons(self, controller):
         button = tk.Button(self, text="Nazad", command=lambda: controller.show_frame(StartPage))
-        button.place(x=50, y=20)
+        button.place(x=button_back_coords['x'], y=button_back_coords['y'])
 
         button_calc = tk.Button(self, text="Ažuriraj", command=lambda: self.update_data(controller))
-        button_calc.pack()
+        button_calc.place(x=450, y=475)
 
     def init_entries(self):
         entry_temp_min = tk.Entry(self, textvariable=self.temp_min)
@@ -233,34 +234,41 @@ class SensorPage(tk.Frame):
         init_buttons(self, controller)
             Makes and places buttons ("Return" button).
 
-        update_data(self, files, values, measures)
+        update_data(self, files, values, measures, titles, color)
             Makes and places graphs and average and current values on the page for all sensor readings.
             Allows values to be updated interactively by clicking update button.
     """
 
-    def update_data(self, files, values, measures, title, unit, color=-1):
+    def update_data(self, files, values, measures, titles, color=-1):
         """Updates graphs and labels on page
 
             Parameters
             ----------
             self : SensorPage
 
-            files : list(str)
-                list of files the data will be generated from
+            :param measures: list(str)
+                list of measuring units ('°C', '%', ...) to construct labels
 
-            values : list(str)
+            :param values: list(str)
                 list of names of values being measured to construct labels (in Croatian)
 
-            measures : list(str)
-                list of measures ('°C', '%', ...) to construct labels
+            :param files: list(str)
+                list of files the data will be generated from
+
+            :param titles: list(str)
+                list of graph titles
+
+            :param color: int
+                index of graph color # TODO: check?
         """
 
         file_num = 0
         for file in files:
-            figure = ec.make_plots([file], (6,5), title, unit, color)
+            figure = ec.make_plots([file], (6, 5), titles[file_num], measures[file_num], color)
             canvas = FigureCanvasTkAgg(figure, self)
             canvas.draw()
-            canvas.get_tk_widget().place(x=200, y=190)
+            canvas.get_tk_widget().place(x=constants.graph_coords[file_num][0],
+                                         y=constants.graph_coords[file_num][1])
 
             # Calculate average value from file and place label accordingly.
             data = pd.read_csv(file, names=headers)
@@ -268,23 +276,28 @@ class SensorPage(tk.Frame):
             self.average_message[file_num].set('Prosječna vrijednost '
                                                + values[file_num] + ': '
                                                + average + measures[file_num])
-            avg_label = tk.Label(self, textvariable=self.average_message[file_num])
+            avg_label = tk.Label(self,
+                                 textvariable=self.average_message[file_num],
+                                 font=MID_FONT)
             avg_label.place(x=text_coords[file_num][0], y=text_coords[file_num][1])
 
             # Use last value from file as current value and place label accordingly
             value = data.iloc[-1]['Vrijednost']
             self.current_message[file_num].set(ec.construct_labels(
                 measure=values[file_num], value=value))
-            indicator_label = tk.Label(self, textvariable=self.current_message[file_num])
+            indicator_label = tk.Label(self,
+                                       textvariable=self.current_message[file_num],
+                                       font=MID_FONT)
             indicator_label.place(x=current_coords[file_num][0], y=current_coords[file_num][1])
-
-            file_num += 1
 
             period_start = pd.read_csv(files[0], names=headers)['Vrijeme'].iloc[0]
             period_end = pd.read_csv(files[0], names=headers)['Vrijeme'].iloc[-1]
-            period_label = tk.Label(self, text=f'Period: {period_start}  do  {period_end}', anchor="w", justify=LEFT,
-                                    font=LARGE_FONT)
-            period_label.place(x=200, y=700)
+            period_label = tk.Label(self, text=f'Period: {period_start} do {period_end}',
+                                    anchor="w", justify=LEFT, font=MID_FONT)
+            period_label.place(x=period_sensorpage_coords['x'],
+                               y=period_sensorpage_coords['y'])
+
+            file_num += 1
 
     def init_label(self, sensor_label):
         label = tk.Label(self, text=sensor_label, font=LARGE_FONT)
@@ -292,7 +305,7 @@ class SensorPage(tk.Frame):
 
     def init_buttons(self, controller):
         button = tk.Button(self, text="Nazad", command=lambda: controller.show_frame(StartPage))
-        button.place(x=200, y=120)
+        button.place(x=button_back_coords['x'], y=button_back_coords['y'])
 
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
@@ -311,13 +324,13 @@ class TMP116Page(SensorPage):
 
         TMP116Page.init_label(self, "TMP116")
         TMP116Page.init_buttons(self, controller)
-        TMP116Page.update_data(self, [tmp116_csv], [temp_string], [temp_measurement], 'Temperatura', '°C')
+        TMP116Page.update_data(self, [tmp116_csv], [temp_string], [temp_measurement], [temp_name])
 
         # a button to update TMP116 page
-        button_update = tk.Button(self, text="Ažuriraj", command=lambda: SensorPage.update_data(
-            self, [tmp116_csv], [temp_string], [temp_measurement], 'Temperatura', '°C'
-        ))
-        button_update.place(x=270, y=120)
+        button_update = tk.Button(self, text="Ažuriraj",
+                                  command=lambda: SensorPage.update_data(
+                                      self, [tmp116_csv], [temp_string], [temp_measurement], [temp_name]))
+        button_update.place(x=button_update_coords['x'], y=button_update_coords['y'])
 
 
 class HDC2010Page(SensorPage):
@@ -331,14 +344,17 @@ class HDC2010Page(SensorPage):
         HDC2010Page.init_label(self, "HDC2010")
         HDC2010Page.init_buttons(self, controller)
         HDC2010Page.update_data(self, [hdc2010_temp_csv, hdc2010_hum_csv],
-                                [temp_string, hum_string], [temp_measurement, hum_measurement], 'Vlažnost zraka', '%', 3)
+                                [temp_string, hum_string],
+                                [temp_measurement, hum_measurement],
+                                [temp_name, hum_name], 3)
 
         # a button to update HDC2010 page
         button_update = tk.Button(self, text="Ažuriraj",
                                   command=lambda: SensorPage.update_data(self, [hdc2010_temp_csv, hdc2010_hum_csv],
                                                                          [temp_string, hum_string],
-                                                                         [temp_measurement, hum_measurement], 'Vlažnost zraka', '%'))
-        button_update.place(x=270, y=120)
+                                                                         [temp_measurement, hum_measurement],
+                                                                         [temp_name, hum_name], 3))
+        button_update.place(x=button_update_coords['x'], y=button_update_coords['y'])
 
 
 class OPT3001Page(SensorPage):
@@ -351,12 +367,12 @@ class OPT3001Page(SensorPage):
 
         OPT3001Page.init_label(self, "OPT3001")
         OPT3001Page.init_buttons(self, controller)
-        OPT3001Page.update_data(self, [opt3001_csv], [light_string], [light_measurement], 'Svjetlina', 'lux', 4)
+        OPT3001Page.update_data(self, [opt3001_csv], [light_string], [light_measurement], [light_name], 4)
 
         # a button to update OPT3001 page
         button_update = tk.Button(self, text="Ažuriraj", command=lambda: SensorPage.update_data(
-            self, [opt3001_csv], [light_string], [light_measurement], 'Svjetlina', 'lux'))
-        button_update.place(x=270, y=120)
+            self, [opt3001_csv], [light_string], [light_measurement], [light_name], 4))
+        button_update.place(x=button_update_coords['x'], y=button_update_coords['y'])
 
 
 class DPS310Page(SensorPage):
@@ -370,21 +386,19 @@ class DPS310Page(SensorPage):
         DPS310Page.init_label(self, "DPS301")
         DPS310Page.init_buttons(self, controller)
         DPS310Page.update_data(self, [dps310_temp_csv, dps310_pressure_csv],
-                               [temp_string, pressure_string], [temp_measurement, pressure_measurement], 'Atmosferski tlak', 'Pa', 5)
+                               [temp_string, pressure_string], [temp_measurement, pressure_measurement],
+                               [temp_name, pressure_name], 5)
 
         # a button to update DPS310 page
         button_update = tk.Button(self, text="Ažuriraj",
                                   command=lambda: SensorPage.update_data(self, [dps310_temp_csv, dps310_pressure_csv],
                                                                          [temp_string, pressure_string],
-                                                                         [temp_measurement, pressure_measurement], 'Atmosferski tlak', 'Pa'))
-        button_update.place(x=270, y=120)
+                                                                         [temp_measurement, pressure_measurement],
+                                                                         [temp_name, pressure_name], 5))
+        button_update.place(x=button_update_coords['x'], y=button_update_coords['y'])
 
 
 class StartPage(tk.Frame):
-    # TODO: update grafova na početnoj strani
-    # TODO: općenito - nazivi grafova, legende, boje, vrijeme očitanja
-    # TODO: jel trebamo i tu ispisivati prosječne vrijednosti ili je dovoljno trenutne?
-
     """
         A class used to represent the app's start page
         Is a child class of tk.Frame
@@ -447,14 +461,21 @@ class StartPage(tk.Frame):
 
         self.indicator_message.set(ec.construct_labels(temp=temp_value, humidity=hum_value, light=light_value,
                                                        pressure=pressure_value, tips_wanted=True))
-        indicator_label = tk.Label(self, textvariable=self.indicator_message)
-        indicator_label.place(x=100, y=675)
+        indicator_label = tk.Label(self, textvariable=self.indicator_message, font=MID_FONT, justify=LEFT)
+        indicator_label.place(x=start_text_coords['x'],
+                              y=start_text_coords['y'])
+
+        period_start = pd.read_csv(hdc2010_hum_csv, names=headers)['Vrijeme'].iloc[0]
+        period_end = pd.read_csv(hdc2010_hum_csv, names=headers)['Vrijeme'].iloc[-1]
+        period_label = tk.Label(self, text=f'Period :  {period_start}\ndo {period_end}',
+                                anchor="w", justify=LEFT, font=MID_FONT)
+        period_label.place(x=period_coords['x'], y=period_coords['y'])
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
         self.indicator_message = tk.StringVar()
-        label = tk.Label(self, text="Start Page", font=LARGE_FONT)
+        label = tk.Label(self, text=START_NAME, font=LARGE_FONT)
         label.pack(pady=10, padx=10)
 
         StartPage.update_start_data(self)

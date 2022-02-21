@@ -34,23 +34,38 @@ MAX_ROWS = 100
 MAX_ROWS_OPT_PRES = 500
 NUM_OF_SENSORS = 6
 LARGE_FONT = ("Verdana", 16)
+MID_FONT = ("Verdana", 11)
 APP_NAME = 'Centrala za upravljanje pametnim stanom'
+START_NAME = 'Početna stranica'
 ICON_PATH = uconfig['icon_path']
 
 # Coordinates arrays - allow element coordinates depend on number of elements in frame
 graph_coords = [[100, 150], [650, 150]]
-text_coords = [[100, 600], [100, 625]]
-current_coords = [[100, 650], [100, 675]]
+text_coords = [[100, 650], [700, 650]]
+current_coords = [[100, 675], [700, 675]]
+start_text_coords = {'x': 1125, 'y': 400}
+period_coords = {'x': 1125, 'y': 200}
+period_sensorpage_coords = {'x': 550, 'y': 100}
+button_update_coords = {'x': 170, 'y': 70}
+button_back_coords = {'x': 100, 'y': 70}
+
+# Graph formation
+temp_name = 'Temperatura'
+hum_name = 'Vlažnost zraka'
+light_name = 'Svjetlina'
+pressure_name = 'Atmosferski tlak'
+
+# Measurement formation
+temp_measurement = ' °C'
+hum_measurement = '%'
+light_measurement = ' lux'
+pressure_measurement = ' Pa'
 
 # String formation
 temp_string = 'temperature'
-temp_measurement = ' °C'
 hum_string = 'vlažnosti zraka'
-hum_measurement = '%'
 light_string = 'razine svjetlosti'
-light_measurement = ' lux'
 pressure_string = 'atmosferskog tlaka'
-pressure_measurement = 'Pa'
 
 low_temp_msg = 'Hladno je. '
 low_temp_tip = 'Upalite grijanje. '
@@ -60,20 +75,20 @@ high_temp_tip = 'Upalite hlađenje. '
 low_hum_msg = 'Vlažnost zraka je niska. '
 
 messages = {'low_temp': 'Hladno je. ',
-            'low_temp_tip': 'Upalite grijanje. ',
+            'low_temp_tip': '\u26A0 Upalite grijanje. ',
             'normal_temp': 'Temperatura je ugodna. ',
             'high_temp': 'Vruće je. ',
-            'high_temp_tip': 'Upalite hlađenje. ',
+            'high_temp_tip': '\u26A0 Upalite hlađenje. ',
             'low_hum': 'Vlažnost zraka je niska. ',
-            'low_hum_tip': 'Upalite ovlaživač zraka. ',
+            'low_hum_tip': '\u26A0 Upalite ovlaživač zraka. ',
             'normal_hum': 'Vlažnost zraka je normalna.',
             'high_hum': 'Vlažnost zraka je visoka. ',
-            'high_hum_tip': 'Pokušajte prozračiti prostoriju. ',
+            'high_hum_tip': '\u26A0 Pokušajte prozračiti prostoriju. ',
             'low_light': 'Premračno je. ',
-            'low_light_tip': 'Otvorite škure ili upalite svjetlo. ',
+            'low_light_tip': '\u26A0 Otvorite škure ili upalite svjetlo. ',
             'normal_light': 'Razina svjetlosti je dobra. ',
-            'high_light': 'Razina svjetlosti je visoka. ',
-            'high_light_tip': 'Zamračite prostoriju. ',
+            'high_light': 'Razina svjetlosti možda je previsoka. ',
+            'high_light_tip': '\u26A0 Zamračite prostoriju. ',
             'low_pressure': 'Atmosferski tlak je nizak. ',
             'low_pressure_tip': 'Mogli biste očekivati kišno vrijeme. ',
             'normal_pressure': 'Atmosferski tlak je ugodan. ',
@@ -88,7 +103,6 @@ messages_high = {key: messages[key]
 
 # Visual
 colors = ['r', 'g', 'b', 'deepskyblue', 'orange', 'darkorchid']
-
 
 # Indicators
 TEMP_MIN = float(uconfig['temp_min'])
