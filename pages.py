@@ -22,15 +22,28 @@ matplotlib.use("TkAgg")
 def validate_entries(values):
     """ Validates entries on Update page and returns True if valid,
         raises warning messagebox if not.
+
+        Messagebox can either contain a warning about invalid formats
+        or invalid ranges (e.g. min > max).
     """
 
     try:
+        # check value formats
         if (float(values['TEMP_MIN']) and float(values['TEMP_MAX'])
                 and float(values['HUM_MIN']) and float(values['HUM_MAX'])
                 and float(values['LUX_MIN']) and float(values['LUX_MAX'])
                 and float(values['PRES_MIN']) and float(values['PRES_MAX'])
                 and re.match("COM[0-9][0-9]?$", values['SERIAL_PORT'])):
-            return True
+
+            # check numeric value ranges (min < max)
+            if (float(values['TEMP_MIN']) < float(values['TEMP_MAX'])
+                    and float(values['HUM_MIN']) < float(values['HUM_MAX'])
+                    and float(values['LUX_MIN']) < float(values['LUX_MAX'])
+                    and float(values['PRES_MIN']) < float(values['PRES_MAX'])):
+                return True
+            else:
+                messagebox.showerror('Neispravan raspon!', 'Molimo, pokušajte ponovo.')
+                return False
         else:
             messagebox.showerror('Neispravan unos!', 'Molimo, pokušajte ponovo.')
         return False
