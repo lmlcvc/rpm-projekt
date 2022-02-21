@@ -50,6 +50,9 @@ class SensorCentral(tk.Tk):
 
         tk.Tk.wm_title(self, constants.APP_NAME)
 
+        w, h = self.winfo_screenwidth(), self.winfo_screenheight()
+        self.geometry("%dx%d+0+0" % (w, h))
+
         container = tk.Frame(self)
         container.pack(side="top", fill="both", expand=True)
         container.grid_rowconfigure(0, weight=1)

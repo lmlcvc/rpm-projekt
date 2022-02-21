@@ -22,7 +22,7 @@ def reload_constants():
     importlib.reload(constants)
 
 
-def make_plots(filepaths, figsize=None, def_color_idx=-1):
+def make_plots(filepaths, figsize=None, title=None, unit=None, def_color_idx=-1):
     # TODO: dodati mjernu veličinu na y os, vrijeme prvog i zadnjeg očitanja na x os, bojanje, \
     #  postaviti legende i naslov grafa
     """ Return sensor readings plot as a plt.Figure.
@@ -40,6 +40,9 @@ def make_plots(filepaths, figsize=None, def_color_idx=-1):
         fh.wait_for_file_input(filepath)
         fh.impl_circular_buffer(filepath)
 
+    df_list = [pd.read_csv(filepath, names=headers) for filepath in filepaths]
+
+    figure = plt.Figure(figsize=figsize, dpi=100, constrained_layout=True)
     df_list = [pd.read_csv(filepath, names=constants.headers) for filepath in filepaths]
     figure = plt.Figure(figsize=figsize, dpi=100)
     ax = figure.add_subplot(111)
@@ -51,8 +54,14 @@ def make_plots(filepaths, figsize=None, def_color_idx=-1):
             color_idx = i
         else:
             color_idx = def_color_idx
-        df_list[i].plot(kind='line', legend=True, ax=ax, color=constants.colors[color_idx], fontsize=10)
-    # ax.set_title(SENZOR + VRIJEDNOST)
+        df_list[i].plot(ax=ax, kind='line', color=colors[color_idx], fontsize=10)
+
+    ax.legend([df.Senzor[0] for df in df_list])
+    ax.set_title(title)
+    ax.set_xticks([])
+    ax.set_ylabel(unit, rotation=0)
+    ax.set_xlabel('vrijeme', rotation=0)
+    ax.yaxis.set_label_coords(-0.05,1.02)
 
     return figure
 

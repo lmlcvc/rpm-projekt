@@ -87,7 +87,7 @@ messages_high = {key: messages[key]
                  for key in ['high_temp', 'high_hum', 'high_light', 'high_pressure']}
 
 # Visual
-colors = ['r', 'g', 'b']
+colors = ['r', 'g', 'b', 'deepskyblue', 'orange', 'darkorchid']
 
 
 # Indicators
