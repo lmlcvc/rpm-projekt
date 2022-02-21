@@ -19,22 +19,52 @@ matplotlib.use("TkAgg")
 
 class UpdatePage(tk.Frame):
     """
-        A class for a page used to update MIN, MAX and other values.
+        A class for a page used to update MIN, MAX values and serial port.
+        This is achieved by fetching new data from the GUI, and calling file_handler.py
+        method write_to_config(values) to change the config.ini file.
 
         Attributes
         ----------
+        temp_min, temp_max, hum_min, ... : tk.StringVar
+            Variables that hold the string values of min/max values of different types of sensor readings.
+
+        serial_port : tk.StringVar
+            Holds the string value of the port your Arduino device should be connected to.
+
+        labels : tk.Label
+            Indicate the values to be modified through Entries.
+
+        entries : tk.Entry
+            Editable text boxes that allow the user to modify values.
+            Each entry is matched to one value.
+
+        buttons : tk.Button
+            Update and Back
 
 
         Methods
         -------
+        init_labels(self, page_label)
+            Initialises page title label and labels indicating Entries' functions.
+
+        init_buttons(self, controller)
+            Initialises Back and Update button and their commands.
+
+        init_entries(self)
+            Initialises Entry elements on the page and their functions.
+
+        update_config(self)
+            Makes a dict of {min/max reading : min/max value} and calls fh.write_to_config with
+            it as parameter, to rewrite the config.ini file with new values.
+
+        update_data(self, controller)
+            Is called on click of Update button.
+            Calls update_config upon self and controller (app)'s update via app_update().
 
     """
 
-    projectedSales = 0.0
-
     def update_data(self, controller):
         self.update_config()
-        self.place_entries()  # dal treba ova linija
         controller.app_update()
 
     def update_config(self):
@@ -87,10 +117,7 @@ class UpdatePage(tk.Frame):
         button_calc = tk.Button(self, text="Ažuriraj", command=lambda: self.update_data(controller))
         button_calc.pack()
 
-    def change_values(self):
-        self.update_data()
-
-    def place_entries(self):
+    def init_entries(self):
         entry_temp_min = tk.Entry(self, textvariable=self.temp_min)
         entry_temp_min.place(x=375, y=125)
 
@@ -133,8 +160,7 @@ class UpdatePage(tk.Frame):
         self.pres_max = tk.StringVar(value=PRES_MAX)
         self.serial_port = tk.StringVar(value=SERIAL_PORT)
 
-        self.place_entries()
-        # self.update_data()
+        self.init_entries()
 
         # TODO: update vrijednosti mora imat neku validaciju
 
@@ -163,7 +189,7 @@ class SensorPage(tk.Frame):
             Makes and places buttons ("Return" button).
 
         update_data(self, files, values, measures)
-            Makes and places graphs and average values on the page for all sensor readings.
+            Makes and places graphs and average and current values on the page for all sensor readings.
             Allows values to be updated interactively by clicking update button.
     """
 
@@ -192,6 +218,7 @@ class SensorPage(tk.Frame):
             canvas.draw()
             canvas.get_tk_widget().place(x=graph_coords[file_num][0], y=graph_coords[file_num][1])
 
+            # Calculate average value from file and place label accordingly.
             data = pd.read_csv(file, names=headers)
             average = str(round(data['Vrijednost'].mean(), 4))
             average_message = 'Prosječna vrijednost ' \
@@ -200,7 +227,8 @@ class SensorPage(tk.Frame):
             avg_label = tk.Label(self, text=average_message)
             avg_label.place(x=text_coords[file_num][0], y=text_coords[file_num][1])
 
-            value = pd.read_csv(file, names=headers).iloc[-1]['Vrijednost']
+            # Use last value from file as current value and place label accordingly
+            value = data.iloc[-1]['Vrijednost']
             indicator_label = tk.Label(self, text=ec.construct_labels(
                 measure=values[file_num], value=value))
             indicator_label.place(x=current_coords[file_num][0], y=current_coords[file_num][1])
@@ -233,13 +261,6 @@ class TMP116Page(SensorPage):
         ))
         button_update.place(x=100, y=20)
 
-        # Read latest value gotten from TMP116
-        # Construct informative message depending on the value
-        # Place value and message on page as a Label
-        """value = pd.read_csv(tmp116_csv, names=headers).iloc[-1]['Vrijednost']
-        indicator_label = tk.Label(self, text=ec.construct_labels(temp=value))
-        indicator_label.place(x=100, y=650)"""
-
 
 class HDC2010Page(SensorPage):
 
@@ -257,17 +278,6 @@ class HDC2010Page(SensorPage):
                                                                          [temp_measurement, hum_measurement]))
         button_update.place(x=100, y=20)
 
-        # Read latest values gotten from HDC2010
-        # Construct informative messages depending on the value
-        # Place values and messages on page as a Label
-        """value = pd.read_csv(hdc2010_temp_csv, names=headers).iloc[-1]['Vrijednost']
-        indicator_label = tk.Label(self, text=ec.construct_labels(temp=value))
-        indicator_label.place(x=100, y=650)
-
-        value = pd.read_csv(hdc2010_hum_csv, names=headers).iloc[-1]['Vrijednost']
-        indicator_label = tk.Label(self, text=ec.construct_labels(humidity=value))
-        indicator_label.place(x=100, y=675)"""
-
 
 class OPT3001Page(SensorPage):
 
@@ -281,13 +291,6 @@ class OPT3001Page(SensorPage):
         button_update = tk.Button(self, text="Ažuriraj", command=lambda: SensorPage.update_data(
             self, [opt3001_csv], [light_string], [light_measurement]))
         button_update.place(x=100, y=20)
-
-        # Read latest value gotten from OPT3001
-        # Construct informative message depending on the value
-        # Place value and message on page as a Label
-        """value = pd.read_csv(opt3001_csv, names=headers).iloc[-1]['Vrijednost']
-        indicator_label = tk.Label(self, text=ec.construct_labels(light=value))
-        indicator_label.place(x=100, y=650)"""
 
 
 class DPS310Page(SensorPage):
@@ -306,22 +309,10 @@ class DPS310Page(SensorPage):
                                                                          [temp_measurement, pressure_measurement]))
         button_update.place(x=100, y=20)
 
-        # Read latest values gotten from DPS310
-        # Construct informative messages depending on the value
-        # Place values and messages on page as a Label
-        """value = pd.read_csv(dps310_temp_csv, names=headers).iloc[-1]['Vrijednost']
-        indicator_label = tk.Label(self, text=ec.construct_labels(temp=value))
-        indicator_label.place(x=100, y=650)
-
-        value = pd.read_csv(dps310_pressure_csv, names=headers).iloc[-1]['Vrijednost']
-        indicator_label = tk.Label(self, text=ec.construct_labels(pressure=value))
-        indicator_label.place(x=100, y=675)"""
-
 
 class StartPage(tk.Frame):
     # TODO: update grafova na početnoj strani
     # TODO: općenito - nazivi grafova, legende, boje, vrijeme očitanja
-    # Što ako app ne npr. ne radi 3 sata? Kako to prikazati na grafu?
     # TODO: jel trebamo i tu ispisivati prosječne vrijednosti ili je dovoljno trenutne?
 
     """

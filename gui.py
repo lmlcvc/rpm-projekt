@@ -39,7 +39,9 @@ class SensorCentral(tk.Tk):
             Raise the frame passed as 'content'.
 
         app_update(self)
-            Call StartPage's update (every 60s, as specified in main app loop).
+            Call update on all sensor pages and start page.
+            As specified in main, this is called every 60 s.
+            Additionally, this is called on every update called from update page.
     """
 
     frames = {}

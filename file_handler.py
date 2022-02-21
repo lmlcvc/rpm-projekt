@@ -129,6 +129,5 @@ def write_to_config(values):
     with open('config.ini', 'w') as configfile:
         config_parser.write(configfile)
 
-    # constants.update_indicators()
     ec.reload_constants()
     # TODO: da se proba ponovo spojit na port

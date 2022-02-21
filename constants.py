@@ -27,7 +27,6 @@ try:
     serial = serial.Serial(SERIAL_PORT, 19200, timeout=1)
 except serial.serialutil.SerialException:
     pass
-    # print(f'Serial port {SERIAL_PORT} unavailable. Connect your device to {SERIAL_PORT} or redefine SERIAL_PORT.')
 
 # Basic application info
 headers = ['Vrijeme', 'Senzor', 'Velicina', 'Vrijednost']
