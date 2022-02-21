@@ -96,13 +96,6 @@ def call_repeatedly(interval, func, *args):
     return stopped.set
 
 
-def thread_serial():
-    """ Thread used to continuously store incoming values from serial to csv if device connected """
-
-    while True:
-        fh.store_to_csv()
-
-
 if __name__ == '__main__':
     fh.folder_prep()  # prepare csv folder
     fh.connect_to_serial()  # start serial communication if available
