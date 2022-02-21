@@ -24,15 +24,19 @@ def validate_entries(values):
         raises warning messagebox if not.
     """
 
-    if (float(values['TEMP_MIN']) and float(values['TEMP_MAX'])
-            and float(values['HUM_MIN']) and float(values['HUM_MAX'])
-            and float(values['LUX_MIN']) and float(values['LUX_MAX'])
-            and float(values['PRES_MIN']) and float(values['PRES_MAX'])
-            and re.match("COM[0-9]$", values['SERIAL_PORT'])):
-        return True
-    else:
+    try:
+        if (float(values['TEMP_MIN']) and float(values['TEMP_MAX'])
+                and float(values['HUM_MIN']) and float(values['HUM_MAX'])
+                and float(values['LUX_MIN']) and float(values['LUX_MAX'])
+                and float(values['PRES_MIN']) and float(values['PRES_MAX'])
+                and re.match("COM[0-9]$", values['SERIAL_PORT'])):
+            return True
+        else:
+            messagebox.showerror('Neispravan unos!', 'Molimo, pokušajte ponovo.')
+        return False
+    except ValueError:
         messagebox.showerror('Neispravan unos!', 'Molimo, pokušajte ponovo.')
-    return False
+        return False
 
 
 class UpdatePage(tk.Frame):
