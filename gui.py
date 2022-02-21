@@ -80,14 +80,11 @@ def call_repeatedly(interval, func, *args):
     return stopped.set
 
 
-def thread_gui():
-    """ Thread used to start and run the GUI. """
+def thread_serial():
+    """ Thread used to continuously store incoming values from serial to csv if device connected """
 
-    app = SensorCentral()  # start the app
-    cancel_future_calls = call_repeatedly(10, app.timed_update, )  # call for repeated app update
-    app.mainloop()  # enter main app loop after repeated calls instantiated
-
-    cancel_future_calls()  # cancel future calls after window closes
+    while True:
+        fh.store_to_csv()
 
 
 if __name__ == '__main__':
@@ -97,13 +94,15 @@ if __name__ == '__main__':
     ports = [tuple(p)[0] for p in list(serial.tools.list_ports.comports())]
     arduino_port = [port for port in ports if SERIAL_PORT in port]
 
+    # start serial communication if connected
     if arduino_port:
         serial.reset_input_buffer()  # clear input serial buffer
 
-    time.sleep(1)  # small delay to stabilise
-    threading.Thread(target=thread_gui).start()  # start gui thread
+        time.sleep(1)  # small delay to stabilise
+        threading.Thread(target=thread_serial).start()  # start thread
 
-    # continuously store incoming values from serial to csv if device connected
-    if arduino_port:
-        while True:
-            fh.store_to_csv()
+    app = SensorCentral()  # start the app
+    cancel_future_calls = call_repeatedly(10, app.timed_update, )  # call for repeated app update
+    app.mainloop()  # enter main app loop after repeated calls instantiated
+
+    cancel_future_calls()  # cancel future calls after window closes
