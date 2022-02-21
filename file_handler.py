@@ -9,28 +9,34 @@ functions:
     * impl_circular_buffer - treats each sensor's CSV as a circular buffer with MAX_ROWS size
     * store_to_csv - listens to serial port and writes values to appropriate CSV files
 """
-
+import importlib
 import os
+from configparser import SafeConfigParser
 from datetime import datetime
 
-from constants import *
+import constants
+import element_constructor as ec
+
+
+# from constants import *
+# from constants import serial
 
 
 def folder_prep():
     """ Prepare and/or modify folder and file locations for sensor readings. """
 
     # make csv folder if it doesn't exist
-    if not os.path.exists(csv_folder):
-        os.makedirs(csv_folder)
+    if not os.path.exists(constants.csv_folder):
+        os.makedirs(constants.csv_folder)
 
     # populate csv folder with specified files if it's empty
-    if len(os.listdir(csv_folder)) == 0:
-        open(tmp116_csv, 'a').close()
-        open(hdc2010_temp_csv, 'a').close()
-        open(hdc2010_hum_csv, 'a').close()
-        open(opt3001_csv, 'a').close()
-        open(dps310_temp_csv, 'a').close()
-        open(dps310_pressure_csv, 'a').close()
+    if len(os.listdir(constants.csv_folder)) == 0:
+        open(constants.tmp116_csv, 'a').close()
+        open(constants.hdc2010_temp_csv, 'a').close()
+        open(constants.hdc2010_hum_csv, 'a').close()
+        open(constants.opt3001_csv, 'a').close()
+        open(constants.dps310_temp_csv, 'a').close()
+        open(constants.dps310_pressure_csv, 'a').close()
 
 
 def wait_for_file_input(filepath):
@@ -46,7 +52,7 @@ def wait_for_file_input(filepath):
         pass
 
 
-def impl_circular_buffer(filepath, buff_size=MAX_ROWS):
+def impl_circular_buffer(filepath, buff_size=constants.MAX_ROWS):
     """ Treat csv file as a circular buffer.
 
         Arguments:
@@ -55,8 +61,8 @@ def impl_circular_buffer(filepath, buff_size=MAX_ROWS):
     """
 
     # light and pressure measures require higher sampling rates (more records)
-    if (filepath == opt3001_csv) or (filepath == dps310_pressure_csv):
-        buff_size = MAX_ROWS_OPT_PRES
+    if (filepath == constants.opt3001_csv) or (filepath == constants.dps310_pressure_csv):
+        buff_size = constants.MAX_ROWS_OPT_PRES
 
     # open file, store its lines to list
     with open(filepath, 'r') as file:
@@ -78,15 +84,15 @@ def impl_circular_buffer(filepath, buff_size=MAX_ROWS):
 def store_to_csv():
     """ Store lines from serial port to respective CSV files. """
 
-    with open(tmp116_csv, 'a', newline='') as tmp116_file, \
-            open(hdc2010_temp_csv, 'a', newline='') as hdc2010_temp_file, \
-            open(hdc2010_hum_csv, 'a', newline='') as hdc2010_hum_file, \
-            open(opt3001_csv, 'a', newline='') as opt3001_file, \
-            open(dps310_temp_csv, 'a', newline='') as dps310_temp_file, \
-            open(dps310_pressure_csv, 'a', newline='') as dps310_pressure_file:
+    with open(constants.tmp116_csv, 'a', newline='') as tmp116_file, \
+            open(constants.hdc2010_temp_csv, 'a', newline='') as hdc2010_temp_file, \
+            open(constants.hdc2010_hum_csv, 'a', newline='') as hdc2010_hum_file, \
+            open(constants.opt3001_csv, 'a', newline='') as opt3001_file, \
+            open(constants.dps310_temp_csv, 'a', newline='') as dps310_temp_file, \
+            open(constants.dps310_pressure_csv, 'a', newline='') as dps310_pressure_file:
 
-        for i in range(NUM_OF_SENSORS):  # TODO: change to while-loop because of different sampling rates
-            line = serial.readline()  # read a byte string
+        for i in range(constants.NUM_OF_SENSORS):  # TODO: change to while-loop because of different sampling rates
+            line = constants.serial.readline()  # read a byte string
 
             now = datetime.now()
             dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
@@ -109,3 +115,20 @@ def store_to_csv():
                     dps310_temp_file.write(dt_string + ', ' + string)
                 elif split_string[0] == 'DPS310' and split_string[1] == 'pressure':
                     dps310_pressure_file.write(dt_string + ', ' + string)
+
+
+def write_to_config(values):
+    config_parser = SafeConfigParser()
+    config_parser.read('config.ini')
+
+    # set values in [updatable] section to those passed as argument
+    for key, value in values.items():
+        config_parser.set('updatable', key, value)
+
+    # write changes to 'config.ini'
+    with open('config.ini', 'w') as configfile:
+        config_parser.write(configfile)
+
+    # constants.update_indicators()
+    ec.reload_constants()
+    # TODO: da se proba ponovo spojit na port
