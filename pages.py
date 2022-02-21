@@ -251,17 +251,17 @@ class SensorPage(tk.Frame):
             # Calculate average value from file and place label accordingly.
             data = pd.read_csv(file, names=headers)
             average = str(round(data['Vrijednost'].mean(), 4))
-            self.average_message.set('Prosječna vrijednost '
-                                     + values[file_num] + ': '
-                                     + average + measures[file_num])
-            avg_label = tk.Label(self, textvariable=self.average_message)
+            self.average_message[file_num].set('Prosječna vrijednost '
+                                               + values[file_num] + ': '
+                                               + average + measures[file_num])
+            avg_label = tk.Label(self, textvariable=self.average_message[file_num])
             avg_label.place(x=text_coords[file_num][0], y=text_coords[file_num][1])
 
             # Use last value from file as current value and place label accordingly
             value = data.iloc[-1]['Vrijednost']
-            self.current_message.set(ec.construct_labels(
+            self.current_message[file_num].set(ec.construct_labels(
                 measure=values[file_num], value=value))
-            indicator_label = tk.Label(self, textvariable=self.current_message)
+            indicator_label = tk.Label(self, textvariable=self.current_message[file_num])
             indicator_label.place(x=current_coords[file_num][0], y=current_coords[file_num][1])
 
             file_num += 1
@@ -277,8 +277,8 @@ class SensorPage(tk.Frame):
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
 
-        self.average_message = tk.StringVar()
-        self.current_message = tk.StringVar()
+        self.average_message = [tk.StringVar(), tk.StringVar()]
+        self.current_message = [tk.StringVar(), tk.StringVar()]
 
 
 class TMP116Page(SensorPage):
@@ -286,8 +286,8 @@ class TMP116Page(SensorPage):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
-        self.average_message = tk.StringVar()
-        self.current_message = tk.StringVar()
+        self.average_message = [tk.StringVar(), tk.StringVar()]
+        self.current_message = [tk.StringVar(), tk.StringVar()]
 
         TMP116Page.init_label(self, "TMP116")
         TMP116Page.init_buttons(self, controller)
@@ -305,8 +305,8 @@ class HDC2010Page(SensorPage):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
-        self.average_message = tk.StringVar()
-        self.current_message = tk.StringVar()
+        self.average_message = [tk.StringVar(), tk.StringVar()]
+        self.current_message = [tk.StringVar(), tk.StringVar()]
 
         HDC2010Page.init_label(self, "HDC2010")
         HDC2010Page.init_buttons(self, controller)
@@ -326,8 +326,8 @@ class OPT3001Page(SensorPage):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
-        self.average_message = tk.StringVar()
-        self.current_message = tk.StringVar()
+        self.average_message = [tk.StringVar(), tk.StringVar()]
+        self.current_message = [tk.StringVar(), tk.StringVar()]
 
         OPT3001Page.init_label(self, "OPT3001")
         OPT3001Page.init_buttons(self, controller)
@@ -344,8 +344,8 @@ class DPS310Page(SensorPage):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
-        self.average_message = tk.StringVar()
-        self.current_message = tk.StringVar()
+        self.average_message = [tk.StringVar(), tk.StringVar()]
+        self.current_message = [tk.StringVar(), tk.StringVar()]
 
         DPS310Page.init_label(self, "DPS301")
         DPS310Page.init_buttons(self, controller)
