@@ -54,8 +54,8 @@ class UpdatePage(tk.Frame):
             Initialises Entry elements on the page and their functions.
 
         update_config(self)
-            Makes a dict of {min/max reading : min/max value} and calls fh.write_to_config with
-            it as parameter, to rewrite the config.ini file with new values.
+            Makes a dict of {min/max reading : min/max value, serial_port : port name}
+            and calls fh.write_to_config with it as parameter, to rewrite the config.ini file with new values.
 
         update_data(self, controller)
             Is called on click of Update button.

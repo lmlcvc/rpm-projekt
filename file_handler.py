@@ -3,23 +3,19 @@
 This file contains methods used for file and directory handling, for purposes of running this application.
 
 It can also be imported as a module and contains the following
-functions:
+methods:
     * folder_prep - makes CSV folder and/or files on specified location, if necessary
     * wait_for_file_input - waits for file to be not-empty before making plots
     * impl_circular_buffer - treats each sensor's CSV as a circular buffer with MAX_ROWS size
     * store_to_csv - listens to serial port and writes values to appropriate CSV files
+    * write_to_config - updates config.ini when called
 """
-import importlib
 import os
 from configparser import SafeConfigParser
 from datetime import datetime
 
 import constants
 import element_constructor as ec
-
-
-# from constants import *
-# from constants import serial
 
 
 def folder_prep():
@@ -118,6 +114,15 @@ def store_to_csv():
 
 
 def write_to_config(values):
+    """ Stores values from Update Page to config.ini.
+        Calls for reload of constants.py module where necessary in order to update whole app.
+
+        Parameters
+        ----------
+            values : dict
+            A dictionary of {min/max reading : min/max value, serial_port : port name}.
+    """
+
     config_parser = SafeConfigParser()
     config_parser.read('config.ini')
 

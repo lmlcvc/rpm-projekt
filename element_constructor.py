@@ -17,10 +17,8 @@ import file_handler as fh
 import constants
 
 
-# from constants import *
-
-
 def reload_constants():
+    """ Reload constants.py module to make all values used updated. """
     importlib.reload(constants)
 
 
