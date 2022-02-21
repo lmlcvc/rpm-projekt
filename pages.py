@@ -182,8 +182,6 @@ class UpdatePage(tk.Frame):
 
         self.init_entries()
 
-        # TODO: update vrijednosti mora imat neku validaciju
-
 
 class SensorPage(tk.Frame):
     """
