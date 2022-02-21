@@ -424,15 +424,19 @@ class StartPage(tk.Frame):
         hum_value = pd.read_csv(hdc2010_hum_csv, names=headers)['Vrijednost'].iloc[-1]
         light_value = pd.read_csv(opt3001_csv, names=headers)['Vrijednost'].iloc[-1]
         pressure_value = pd.read_csv(dps310_pressure_csv, names=headers)['Vrijednost'].iloc[-1]
-        indicator_label = tk.Label(self,
-                                   text=ec.construct_labels(temp=temp_value, humidity=hum_value, light=light_value,
-                                                            pressure=pressure_value, tips_wanted=True))
+
+        self.indicator_message.set(ec.construct_labels(temp=temp_value, humidity=hum_value, light=light_value,
+                                                       pressure=pressure_value, tips_wanted=True))
+        indicator_label = tk.Label(self, textvariable=self.indicator_message)
         indicator_label.place(x=100, y=675)
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
+
+        self.indicator_message = tk.StringVar()
         label = tk.Label(self, text="Start Page", font=LARGE_FONT)
         label.pack(pady=10, padx=10)
+
         StartPage.update_start_data(self)
 
         button_tmp = tk.Button(self, text="TMP116 očitanja", command=lambda: controller.show_frame(TMP116Page))
