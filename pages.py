@@ -29,7 +29,7 @@ def validate_entries(values):
                 and float(values['HUM_MIN']) and float(values['HUM_MAX'])
                 and float(values['LUX_MIN']) and float(values['LUX_MAX'])
                 and float(values['PRES_MIN']) and float(values['PRES_MAX'])
-                and re.match("COM[0-9]$", values['SERIAL_PORT'])):
+                and re.match("COM[0-9][0-9]?$", values['SERIAL_PORT'])):
             return True
         else:
             messagebox.showerror('Neispravan unos!', 'Molimo, pokušajte ponovo.')
