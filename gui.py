@@ -2,8 +2,8 @@
 
 This file contains the app (Tk) class, and the main method which starts the GUI and serial communication.
 
-Running both simultaneously makes use of multithreading. A separate thread is started to run the app.
-This allows for all values to be updatable.
+Running both simultaneously makes use of multithreading.
+A separate thread is started to run the serial communication.
 
 This file is the starting point of the app. It creates the folder and files sensor readings will be stored into,
 starts serial communication with the Arduino Micro, and starts the app.
