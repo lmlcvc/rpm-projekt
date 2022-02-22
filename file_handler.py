@@ -125,6 +125,8 @@ def thread_serial():
 
 
 def check_serial_connection():
+    """ Return True if SERIAL_PORT active, False if not. """
+
     # check if port defined as SERIAL_PORT has a device connected to it
     ports = [tuple(p)[0] for p in list(serial.tools.list_ports.comports())]
     arduino_port = [port for port in ports if constants.SERIAL_PORT in port]
