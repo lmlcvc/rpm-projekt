@@ -290,6 +290,7 @@ class SensorPage(tk.Frame):
                                        font=MID_FONT)
             indicator_label.place(x=current_coords[file_num][0], y=current_coords[file_num][1])
 
+            # Calculate and place period label
             period_start = pd.read_csv(files[0], names=headers)['Vrijeme'].iloc[0]
             period_end = pd.read_csv(files[0], names=headers)['Vrijeme'].iloc[-1]
             period_label = tk.Label(self, text=f'Period: {period_start} do {period_end}',
@@ -410,6 +411,12 @@ class StartPage(tk.Frame):
             Values measured using multiple sensors are represented on same graph (e.g. temperature),
             using different colour lines.
 
+        indicator_message : tk.StringVar
+            Variable message with current values
+
+        doors_message : tk.StringVar
+            Variable message saying when doors and windows were last opened
+
         current values : tk.Label
             Contains latest measure values and appropriate messages.
             Messages also contain tips (telling the user to heat the room, let light in, etc.).
@@ -424,6 +431,9 @@ class StartPage(tk.Frame):
         update_start_data(self)
             Makes and places graphs and current values on the page for all sensors' readings.
             Allows values to be updated interactively by clicking update button.
+
+        update_doors_message(self, time)
+            When doors or window opening has been detected, update that label
     """
 
     def update_start_data(self):
@@ -451,7 +461,7 @@ class StartPage(tk.Frame):
         canvas.draw()
         canvas.get_tk_widget().place(x=600, y=480)
 
-        # current values
+        # current values calculation and label
         temp_value = round(np.average([pd.read_csv(tmp116_csv, names=headers)['Vrijednost'].iloc[-1],
                                        pd.read_csv(hdc2010_temp_csv, names=headers)['Vrijednost'].iloc[-1],
                                        pd.read_csv(dps310_temp_csv, names=headers)['Vrijednost'].iloc[-1]]), 4)
@@ -465,18 +475,27 @@ class StartPage(tk.Frame):
         indicator_label.place(x=start_text_coords['x'],
                               y=start_text_coords['y'])
 
-        period_start = pd.read_csv(hdc2010_hum_csv, names=headers)['Vrijeme'].iloc[0]
-        period_end = pd.read_csv(hdc2010_hum_csv, names=headers)['Vrijeme'].iloc[-1]
+        # measuring period calculation and label
+        period_start = pd.read_csv(opt3001_csv, names=headers)['Vrijeme'].iloc[0]
+        period_end = pd.read_csv(opt3001_csv, names=headers)['Vrijeme'].iloc[-1]
         period_label = tk.Label(self, text=f'Period :  {period_start}\ndo {period_end}',
                                 anchor="w", justify=LEFT, font=MID_FONT)
         period_label.place(x=period_coords['x'], y=period_coords['y'])
+
+    def update_doors_message(self, time):
+        self.doors_message.set(door_open_msg + time)
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
         self.indicator_message = tk.StringVar()
+        self.doors_message = tk.StringVar()
+
         label = tk.Label(self, text=START_NAME, font=LARGE_FONT)
         label.pack(pady=10, padx=10)
+
+        label_doors = tk.Label(self, textvariable=self.doors_message, font=MID_FONT)
+        label_doors.place(x=doors_message_coords['x'], y=doors_message_coords['y'])
 
         StartPage.update_start_data(self)
 

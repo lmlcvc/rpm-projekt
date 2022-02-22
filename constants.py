@@ -30,20 +30,22 @@ except serial.serialutil.SerialException:
 
 # Basic application info
 headers = ['Vrijeme', 'Senzor', 'Velicina', 'Vrijednost']
-MAX_ROWS = 100
-MAX_ROWS_OPT_PRES = 500
+BUFFER_MINUTES = 10
 NUM_OF_SENSORS = 6
 LARGE_FONT = ("Verdana", 16)
 MID_FONT = ("Verdana", 11)
 APP_NAME = 'Centrala za upravljanje pametnim stanom'
 START_NAME = 'Početna stranica'
 ICON_PATH = uconfig['icon_path']
+PRESSURE_INTERVAL_SECS = 10
+PRESSURE_DIFF_PA = 5
 
 # Coordinates arrays - allow element coordinates depend on number of elements in frame
 graph_coords = [[100, 150], [650, 150]]
 text_coords = [[100, 650], [700, 650]]
 current_coords = [[100, 675], [700, 675]]
 start_text_coords = {'x': 1125, 'y': 400}
+doors_message_coords = {'x': 1125, 'y': 700}
 period_coords = {'x': 1125, 'y': 200}
 period_sensorpage_coords = {'x': 550, 'y': 100}
 button_update_coords = {'x': 170, 'y': 70}
@@ -73,6 +75,7 @@ normal_temp_msg = 'Temperatura je ugodna. '
 high_temp_msg = 'Vruće je. '
 high_temp_tip = 'Upalite hlađenje. '
 low_hum_msg = 'Vlažnost zraka je niska. '
+door_open_msg = 'Vrata ili prozori zadnji su put bili otvarani u '
 
 messages = {'low_temp': 'Hladno je. ',
             'low_temp_tip': '\u26A0 Upalite grijanje. ',

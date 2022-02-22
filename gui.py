@@ -10,6 +10,7 @@ This file is the starting point of the app. It creates the folder and files sens
 starts serial communication with the Arduino Micro, and starts the app.
 It also defines all methods necessary for runtime app use.
 """
+import sys
 import threading
 import tkinter as tk
 import matplotlib
@@ -39,7 +40,7 @@ class SensorCentral(tk.Tk):
 
         app_update(self)
             Call update on all sensor pages and start page.
-            As specified in main, this is called every 60 s.
+            As specified in main, this is called every 10 s.
             Additionally, this is called on every update called from update page.
     """
 
@@ -72,6 +73,10 @@ class SensorCentral(tk.Tk):
     def app_update(self):
         pg.StartPage.update_start_data(self.frames[pg.StartPage])
 
+        time = fh.check_pressure_diffs()
+        if time != '':
+            pg.StartPage.update_doors_message(self.frames[pg.StartPage], time)
+
         pg.TMP116Page.update_data(self.frames[pg.TMP116Page],
                                   [constants.tmp116_csv], [constants.temp_string], [constants.temp_measurement],
                                   [constants.temp_name])
@@ -93,8 +98,10 @@ class SensorCentral(tk.Tk):
                                   [constants.temp_name, constants.pressure_name], 5)
 
 
+
 def call_repeatedly(interval, func, *args):
     """ Call func(*args) every {interval} seconds. """
+
     stopped = threading.Event()
 
     def loop():
@@ -109,6 +116,8 @@ if __name__ == '__main__':
     fh.folder_prep()  # prepare csv folder
     fh.connect_to_serial()  # start serial communication if available
 
+    fh.wait_for_file_input(constants.dps310_temp_csv)  # wait for file inputs to stabilise
+
     app = SensorCentral()  # start the app
     cancel_future_calls = call_repeatedly(10, app.app_update, )  # call for repeated app update
     app.iconbitmap(constants.ICON_PATH)  # set app icon
@@ -116,3 +125,4 @@ if __name__ == '__main__':
     app.mainloop()  # enter main app loop after repeated calls instantiated
 
     cancel_future_calls()  # cancel future calls after window closes
+    sys.exit()  # exit program after window closes
