@@ -411,6 +411,12 @@ class StartPage(tk.Frame):
             Values measured using multiple sensors are represented on same graph (e.g. temperature),
             using different colour lines.
 
+        indicator_message : tk.StringVar
+            Variable message with current values
+
+        doors_message : tk.StringVar
+            Variable message saying when doors and windows were last opened
+
         current values : tk.Label
             Contains latest measure values and appropriate messages.
             Messages also contain tips (telling the user to heat the room, let light in, etc.).
@@ -425,6 +431,9 @@ class StartPage(tk.Frame):
         update_start_data(self)
             Makes and places graphs and current values on the page for all sensors' readings.
             Allows values to be updated interactively by clicking update button.
+
+        update_doors_message(self, time)
+            When doors or window opening has been detected, update that label
     """
 
     def update_start_data(self):

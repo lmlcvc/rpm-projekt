@@ -9,6 +9,9 @@ methods:
     * impl_circular_buffer - treats each sensor's CSV as a circular buffer with BUFFER_MINUTES length
     * store_to_csv - listens to serial port and writes values to appropriate CSV files
     * write_to_config - updates config.ini (and app functionalities) when called
+    * check_serial_connection() - check if SERIAL_PORT Arduino communication available
+    * connect_to_serial() - connect to Arduino communicarion on SERIAL_PORT if available
+    * check_pressure_diffs - detects significant pressure differences that could mean door/window opening
 """
 import os
 import threading
@@ -55,6 +58,8 @@ def wait_for_file_input(filepath):
 
 
 def check_pressure_diffs():
+    """ Detect significant pressure differences that could mean door/window opening. """
+
     # read pressure csv and convert values to datetime
     pressure_data = pd.read_csv(constants.dps310_pressure_csv, names=constants.headers)
     pressure_data['Vrijeme'] = pd.to_datetime(pressure_data['Vrijeme'], format='%d/%m/%Y %H:%M:%S')
