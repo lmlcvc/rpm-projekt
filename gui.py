@@ -10,6 +10,7 @@ This file is the starting point of the app. It creates the folder and files sens
 starts serial communication with the Arduino Micro, and starts the app.
 It also defines all methods necessary for runtime app use.
 """
+import sys
 import threading
 import tkinter as tk
 import matplotlib
@@ -116,3 +117,4 @@ if __name__ == '__main__':
     app.mainloop()  # enter main app loop after repeated calls instantiated
 
     cancel_future_calls()  # cancel future calls after window closes
+    sys.exit()  # exit program after window closes

@@ -95,7 +95,6 @@ def store_to_csv():
 
         now = datetime.now()
         dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
-        print(line)
 
         if line:
             string = line.decode()  # convert the byte string to a unicode string
@@ -150,7 +149,7 @@ def connect_to_serial():
         constants.serial.reset_input_buffer()  # clear input serial buffer
 
         time.sleep(1)  # small delay to stabilise
-        threading.Thread(target=thread_serial).start()  # start thread
+        threading.Thread(target=thread_serial, daemon=True).start()  # start thread
 
     # if not, print a message to console
     else:
