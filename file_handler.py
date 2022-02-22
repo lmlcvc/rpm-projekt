@@ -91,48 +91,62 @@ def store_to_csv():
             open(constants.dps310_temp_csv, 'a', newline='') as dps310_temp_file, \
             open(constants.dps310_pressure_csv, 'a', newline='') as dps310_pressure_file:
 
-        for i in range(constants.NUM_OF_SENSORS):  # TODO: change to while-loop because of different sampling rates
-            line = constants.serial.readline()  # read a byte string
+        line = constants.serial.readline()  # read a byte string
 
-            now = datetime.now()
-            dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+        now = datetime.now()
+        dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+        print(line)
 
-            if line:
-                string = line.decode()  # convert the byte string to a unicode string
-                split_string = string.split(', ')
+        if line:
+            string = line.decode()  # convert the byte string to a unicode string
+            split_string = string.split(', ')
 
-                # choose write file location based on sensor name and value
-                # add current time to record
-                if split_string[0] == 'TMP116':
-                    tmp116_file.write(dt_string + ', ' + string)
-                elif split_string[0] == 'HDC2010' and split_string[1] == 'temperature':
-                    hdc2010_temp_file.write(dt_string + ', ' + string)
-                elif split_string[0] == 'HDC2010' and split_string[1] == 'humidity':
-                    hdc2010_hum_file.write(dt_string + ', ' + string)
-                elif split_string[0] == 'OPT3001':
-                    opt3001_file.write(dt_string + ', ' + string)
-                elif split_string[0] == 'DPS310' and split_string[1] == 'temperature':
-                    dps310_temp_file.write(dt_string + ', ' + string)
-                elif split_string[0] == 'DPS310' and split_string[1] == 'pressure':
-                    dps310_pressure_file.write(dt_string + ', ' + string)
+            # choose write file location based on sensor name and value
+            # add current time to record
+            if split_string[0] == 'TMP116':
+                tmp116_file.write(dt_string + ', ' + string)
+            elif split_string[0] == 'HDC2010' and split_string[1] == 'temperature':
+                hdc2010_temp_file.write(dt_string + ', ' + string)
+            elif split_string[0] == 'HDC2010' and split_string[1] == 'humidity':
+                hdc2010_hum_file.write(dt_string + ', ' + string)
+            elif split_string[0] == 'OPT3001':
+                opt3001_file.write(dt_string + ', ' + string)
+            elif split_string[0] == 'DPS310' and split_string[1] == 'temperature':
+                dps310_temp_file.write(dt_string + ', ' + string)
+            elif split_string[0] == 'DPS310' and split_string[1] == 'pressure':
+                dps310_pressure_file.write(dt_string + ', ' + string)
 
 
 def thread_serial():
     """ Thread used to continuously store incoming values from serial to csv if device connected """
 
     while True:
-        store_to_csv()
+        if check_serial_connection():
+            store_to_csv()
 
 
-def connect_to_serial():
-    """ Connect to serial port if available. """
-
+def check_serial_connection():
     # check if port defined as SERIAL_PORT has a device connected to it
     ports = [tuple(p)[0] for p in list(serial.tools.list_ports.comports())]
     arduino_port = [port for port in ports if constants.SERIAL_PORT in port]
 
     # start serial communication if connected
     if arduino_port:
+        return True
+
+    return False
+
+
+def connect_to_serial():
+    """ Connect to serial port if available. """
+
+    # check if port defined as SERIAL_PORT has a device connected to it
+    """ports = [tuple(p)[0] for p in list(serial.tools.list_ports.comports())]
+    arduino_port = [port for port in ports if constants.SERIAL_PORT in port]
+
+    # start serial communication if connected
+    if arduino_port:"""
+    if check_serial_connection():
         constants.serial.reset_input_buffer()  # clear input serial buffer
 
         time.sleep(1)  # small delay to stabilise
