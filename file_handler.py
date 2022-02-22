@@ -53,7 +53,7 @@ def wait_for_file_input(filepath):
 
 
 def impl_circular_buffer(filepath):
-    """ Treat csv file as a circular buffer.
+    """ Treat csv file as a circular buffer with BUFFER_MINUTES size.
 
         Arguments:
             filepath - location of the file being modified
@@ -140,11 +140,6 @@ def connect_to_serial():
     """ Connect to serial port if available. """
 
     # check if port defined as SERIAL_PORT has a device connected to it
-    """ports = [tuple(p)[0] for p in list(serial.tools.list_ports.comports())]
-    arduino_port = [port for port in ports if constants.SERIAL_PORT in port]
-
-    # start serial communication if connected
-    if arduino_port:"""
     if check_serial_connection():
         constants.serial.reset_input_buffer()  # clear input serial buffer
 

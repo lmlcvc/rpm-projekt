@@ -40,7 +40,7 @@ class SensorCentral(tk.Tk):
 
         app_update(self)
             Call update on all sensor pages and start page.
-            As specified in main, this is called every 60 s.
+            As specified in main, this is called every 10 s.
             Additionally, this is called on every update called from update page.
     """
 
@@ -96,6 +96,7 @@ class SensorCentral(tk.Tk):
 
 def call_repeatedly(interval, func, *args):
     """ Call func(*args) every {interval} seconds. """
+
     stopped = threading.Event()
 
     def loop():
