@@ -465,8 +465,8 @@ class StartPage(tk.Frame):
         indicator_label.place(x=start_text_coords['x'],
                               y=start_text_coords['y'])
 
-        period_start = pd.read_csv(hdc2010_hum_csv, names=headers)['Vrijeme'].iloc[0]
-        period_end = pd.read_csv(hdc2010_hum_csv, names=headers)['Vrijeme'].iloc[-1]
+        period_start = pd.read_csv(opt3001_csv, names=headers)['Vrijeme'].iloc[0]
+        period_end = pd.read_csv(opt3001_csv, names=headers)['Vrijeme'].iloc[-1]
         period_label = tk.Label(self, text=f'Period :  {period_start}\ndo {period_end}',
                                 anchor="w", justify=LEFT, font=MID_FONT)
         period_label.place(x=period_coords['x'], y=period_coords['y'])
