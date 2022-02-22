@@ -16,7 +16,9 @@ from configparser import SafeConfigParser
 import time
 from datetime import datetime
 
+import pandas as pd
 import serial.tools.list_ports
+from future.backports.datetime import timedelta
 
 import constants
 import element_constructor as ec
@@ -50,6 +52,41 @@ def wait_for_file_input(filepath):
     while ((os.path.exists(filepath) and os.path.getsize(filepath) == 0)
            or not os.path.exists(filepath)):
         pass
+
+
+def check_pressure_diffs():
+    # read pressure csv and convert values to datetime
+    pressure_data = pd.read_csv(constants.dps310_pressure_csv, names=constants.headers)
+    pressure_data['Vrijeme'] = pd.to_datetime(pressure_data['Vrijeme'], format='%d/%m/%Y %H:%M:%S')
+
+    # construct PRESSURE_INTERVAL_SECS duration datetime object to be added to times
+    seconds_delta = timedelta(seconds=constants.PRESSURE_INTERVAL_SECS)
+
+    # add PRESSURE_INTERVAL_SECONDS to 'Vrijeme' in all rows
+    pressure_data['Vrijeme'] = pressure_data['Vrijeme'] + seconds_delta
+
+    # filter out readings from last PRESSURE_INTERVAL_SECS seconds
+    pressure_data_nsecs = pressure_data[pressure_data['Vrijeme'] > datetime.now()]
+
+    # filter out rows with min and max pressure values
+    max_value_row = pressure_data_nsecs[pressure_data_nsecs['Vrijednost'] == pressure_data_nsecs['Vrijednost'].max()]
+    min_value_row = pressure_data_nsecs[pressure_data_nsecs['Vrijednost'] == pressure_data_nsecs['Vrijednost'].min()]
+
+    # return at what time the dip/increase in pressure happened
+    if not max_value_row.empty and not min_value_row.empty:
+
+        # there can be multiple rows w/ same min/max value
+        # return the first one because the HH:MM value would be same either way
+        if max_value_row['Vrijednost'].iloc[0] - min_value_row['Vrijednost'].iloc[0] > 5:
+
+            # return the sooner timestamp in HH:MM format or '' if not applicable
+            if max_value_row['Vrijeme'].iloc[0] < min_value_row['Vrijeme'].iloc[0]:
+                return max_value_row['Vrijeme'].iloc[0].strftime('%H:%M')
+            else:
+                return min_value_row['Vrijeme'].iloc[0].strftime('%H:%M')
+        else:
+            return ''
+    return ''
 
 
 def impl_circular_buffer(filepath):

@@ -111,6 +111,8 @@ if __name__ == '__main__':
     fh.folder_prep()  # prepare csv folder
     fh.connect_to_serial()  # start serial communication if available
 
+    fh.wait_for_file_input(constants.dps310_temp_csv)  # wait for file inputs to stabilise
+
     app = SensorCentral()  # start the app
     cancel_future_calls = call_repeatedly(10, app.app_update, )  # call for repeated app update
     app.iconbitmap(constants.ICON_PATH)  # set app icon
