@@ -473,12 +473,20 @@ class StartPage(tk.Frame):
                                 anchor="w", justify=LEFT, font=MID_FONT)
         period_label.place(x=period_coords['x'], y=period_coords['y'])
 
+    def update_doors_message(self, time):
+        self.doors_message.set(door_open_msg + time)
+
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
         self.indicator_message = tk.StringVar()
+        self.doors_message = tk.StringVar()
+
         label = tk.Label(self, text=START_NAME, font=LARGE_FONT)
         label.pack(pady=10, padx=10)
+
+        label_doors = tk.Label(self, textvariable=self.doors_message, font=MID_FONT)
+        label_doors.place(x=doors_message_coords['x'], y=doors_message_coords['y'])
 
         StartPage.update_start_data(self)
 

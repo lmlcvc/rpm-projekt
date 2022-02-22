@@ -45,6 +45,7 @@ graph_coords = [[100, 150], [650, 150]]
 text_coords = [[100, 650], [700, 650]]
 current_coords = [[100, 675], [700, 675]]
 start_text_coords = {'x': 1125, 'y': 400}
+doors_message_coords = {'x': 1125, 'y': 700}
 period_coords = {'x': 1125, 'y': 200}
 period_sensorpage_coords = {'x': 550, 'y': 100}
 button_update_coords = {'x': 170, 'y': 70}
@@ -74,6 +75,7 @@ normal_temp_msg = 'Temperatura je ugodna. '
 high_temp_msg = 'Vruće je. '
 high_temp_tip = 'Upalite hlađenje. '
 low_hum_msg = 'Vlažnost zraka je niska. '
+door_open_msg = 'Vrata ili prozori zadnji su put bili otvarani u '
 
 messages = {'low_temp': 'Hladno je. ',
             'low_temp_tip': '\u26A0 Upalite grijanje. ',
