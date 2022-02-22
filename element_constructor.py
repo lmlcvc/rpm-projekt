@@ -9,7 +9,6 @@ functions:
     * construct_labels - constructs labels based on current value; can include tips as well
 """
 import importlib
-
 import pandas as pd
 from matplotlib import pyplot as plt
 
@@ -55,6 +54,7 @@ def make_plots(filepaths, figsize=None, title=None, unit=None, def_color_idx=-1)
     ax.set_xticks([])
     ax.set_ylabel(unit, rotation=0)
     ax.set_xlabel('vrijeme', rotation=0)
+    ax.ticklabel_format(useOffset=False)
     ax.yaxis.set_label_coords(-0.05, 1.02)
 
     return figure
