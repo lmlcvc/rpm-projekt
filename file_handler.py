@@ -6,7 +6,7 @@ It can also be imported as a module and contains the following
 methods:
     * folder_prep - makes CSV folder and/or files on specified location, if necessary
     * wait_for_file_input - waits for file to be not-empty before making plots
-    * impl_circular_buffer - treats each sensor's CSV as a circular buffer with MAX_ROWS size
+    * impl_circular_buffer - treats each sensor's CSV as a circular buffer with BUFFER_MINUTES length
     * store_to_csv - listens to serial port and writes values to appropriate CSV files
     * write_to_config - updates config.ini (and app functionalities) when called
 """
@@ -52,33 +52,33 @@ def wait_for_file_input(filepath):
         pass
 
 
-def impl_circular_buffer(filepath, buff_size=constants.MAX_ROWS):
+def impl_circular_buffer(filepath):
     """ Treat csv file as a circular buffer.
 
         Arguments:
             filepath - location of the file being modified
-            buff_size - size of buffer depending on sampling frequency; default MAX_ROWS
     """
 
-    # light and pressure measures require higher sampling rates (more records)
-    if (filepath == constants.opt3001_csv) or (filepath == constants.dps310_pressure_csv):
-        buff_size = constants.MAX_ROWS_OPT_PRES
-
-    # open file, store its lines to list
+    # open file, store lines newer than 10 minutes to list
+    # discard older lines
     with open(filepath, 'r') as file:
         lines = []
+        now = datetime.now()
         for row in file.readlines():
-            lines.append(row)
-        num_rows = len(lines)
+            data = row.split(',')
+            timestamp = datetime.strptime(data[0], '%d/%m/%Y %H:%M:%S')
+
+            time_delta = now - timestamp
+            seconds_delta = time_delta.total_seconds()
+            minutes_delta = seconds_delta / 60
+
+            if minutes_delta < constants.BUFFER_MINUTES:
+                lines.append(row)
     file.close()
 
-    # remove any oldest lines that exceed maximum buffer size and write result to file
-    if num_rows > buff_size:
-        extra_rows = num_rows - buff_size
-        with open(filepath, 'w') as file:
-            file.writelines(lines[:1] + lines[(extra_rows + 1):])
-    file.close()
-    return
+    # write lines to file
+    with open(filepath, 'w') as file:
+        file.writelines(lines)
 
 
 def store_to_csv():

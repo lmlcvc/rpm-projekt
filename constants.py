@@ -30,8 +30,7 @@ except serial.serialutil.SerialException:
 
 # Basic application info
 headers = ['Vrijeme', 'Senzor', 'Velicina', 'Vrijednost']
-MAX_ROWS = 100
-MAX_ROWS_OPT_PRES = 500
+BUFFER_MINUTES = 10
 NUM_OF_SENSORS = 6
 LARGE_FONT = ("Verdana", 16)
 MID_FONT = ("Verdana", 11)
