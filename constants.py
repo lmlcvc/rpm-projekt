@@ -40,7 +40,7 @@ PRESSURE_INTERVAL_SECS = 2
 PRESSURE_DIFF_PA = 4
 
 # Fonts
-LARGE_FONT = ("Verdana", 16)
+LARGE_FONT = ("Verdana", 18)
 MID_FONT = ("Verdana", 11)
 MID_FONT_UNDERLINE = ("Verdana", 11, "underline")
 MID_FONT_SMALLER = ("Verdana", 10)
