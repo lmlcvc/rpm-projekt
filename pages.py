@@ -516,7 +516,7 @@ class StartPage(tk.Frame):
         self.doors_message = tk.StringVar()
 
         label = tk.Label(self, text=START_NAME, font=LARGE_FONT)
-        label.pack(pady=10, padx=10)
+        label.place(relx=0.4, y=25)
 
         label_current = tk.Label(self, text='TRENUTNE VRIJEDNOSTI:', font=MID_FONT_UNDERLINE)
         label_current.place(x=1125, y=370)
