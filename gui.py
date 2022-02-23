@@ -80,10 +80,6 @@ class SensorCentral(tk.Tk):
     def app_update(self):
         pg.StartPage.update_start_data(self.frames[pg.StartPage])
 
-        time = fh.check_pressure_diffs()
-        if time != '':
-            pg.StartPage.update_doors_message(self.frames[pg.StartPage], time)
-
         pg.TMP116Page.update_data(self.frames[pg.TMP116Page],
                                   [constants.tmp116_csv], [constants.temp_string], [constants.temp_measurement],
                                   [constants.temp_name])
@@ -103,6 +99,11 @@ class SensorCentral(tk.Tk):
                                   [constants.temp_string, constants.pressure_string],
                                   [constants.temp_measurement, constants.pressure_measurement],
                                   [constants.temp_name, constants.pressure_name], 5)
+
+    def pressure_update(self):
+        time = fh.check_pressure_diffs()
+        if time != '':
+            pg.StartPage.update_doors_message(self.frames[pg.StartPage], time)
 
 
 def call_repeatedly(interval, func, *args):
@@ -125,6 +126,9 @@ if __name__ == '__main__':
     app = SensorCentral()  # start the app
     cancel_future_calls = call_repeatedly(constants.APP_UPDATE_INTERVAL_SECS,
                                           app.app_update, )  # call for repeated app update
+    cancel_pressure_calls = call_repeatedly(constants.PRESSURE_INTERVAL_SECS,
+                                            app.pressure_update, ) # call repeated door open checks
+
     app.iconbitmap(constants.ICON_PATH)  # set app icon
 
     app.mainloop()  # enter main app loop after repeated calls instantiated

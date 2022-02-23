@@ -38,8 +38,8 @@ MID_FONT = ("Verdana", 11)
 APP_NAME = 'Centrala za upravljanje pametnim stanom'
 START_NAME = 'Početna stranica'
 ICON_PATH = uconfig['icon_path']
-PRESSURE_INTERVAL_SECS = 10
-PRESSURE_DIFF_PA = 5
+PRESSURE_INTERVAL_SECS = 2
+PRESSURE_DIFF_PA = 4
 
 # Coordinates arrays - allow element coordinates depend on number of elements in frame
 graph_coords = [[100, 150], [650, 150]]
