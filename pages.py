@@ -540,7 +540,7 @@ class StartPage(tk.Frame):
 
         button_updatepage = tk.Button(self, text="Ažuriranje vrijednosti",
                                       command=lambda: controller.show_frame(UpdatePage))
-        button_updatepage.pack()
+        button_updatepage.place(x=1125, y=100)
 
         button_update = tk.Button(self, text="Ažuriraj", command=lambda: StartPage.update_start_data(self))
         button_update.place(x=50, y=100)
