@@ -30,15 +30,21 @@ except serial.serialutil.SerialException:
 
 # Basic application info
 headers = ['Vrijeme', 'Senzor', 'Velicina', 'Vrijednost']
+START_UPDATE_INTERVAL_SECS = 2
+SENSOR_UPDATE_INTERVAL_SECS = 10
 BUFFER_MINUTES = 10
 NUM_OF_SENSORS = 6
-LARGE_FONT = ("Verdana", 16)
-MID_FONT = ("Verdana", 11)
 APP_NAME = 'Centrala za upravljanje pametnim stanom'
-START_NAME = 'Početna stranica'
+START_NAME = 'POČETNA STRANICA'
 ICON_PATH = uconfig['icon_path']
-PRESSURE_INTERVAL_SECS = 10
-PRESSURE_DIFF_PA = 5
+PRESSURE_INTERVAL_SECS = 2
+PRESSURE_DIFF_PA = 4
+
+# Fonts
+LARGE_FONT = ("Verdana", 18)
+MID_FONT = ("Verdana", 11)
+MID_FONT_UNDERLINE = ("Verdana", 11, "underline")
+MID_FONT_SMALLER = ("Verdana", 10)
 
 # Coordinates arrays - allow element coordinates depend on number of elements in frame
 graph_coords = [[100, 150], [650, 150]]
@@ -94,7 +100,7 @@ messages = {'low_temp': 'Hladno je. ',
             'high_light_tip': '\u26A0 Zamračite prostoriju. ',
             'low_pressure': 'Atmosferski tlak je nizak. ',
             'low_pressure_tip': 'Mogli biste očekivati kišno vrijeme. ',
-            'normal_pressure': 'Atmosferski tlak je ugodan. ',
+            'normal_pressure': 'Atmosferski tlak je normalan. ',
             'high_pressure': 'Atmosferski tlak je visok. ',
             'high_pressure_tip': 'Vrijeme će biti vedro i suho. '}
 

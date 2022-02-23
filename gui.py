@@ -39,8 +39,13 @@ class SensorCentral(tk.Tk):
             Raise the frame passed as 'content'.
 
         app_update(self)
-            Call update on all sensor pages and start page.
-            As specified in main, this is called every 10 s.
+            Call update on start page and check for door/window openings.
+            As specified in main, this is called every START_UPDATE_INTERVAL_SECS s.
+            Additionally, this is called on every update called from update page.
+
+        sensor_update(self)
+            Call update on sensor pages.
+            As specified in main, this is called every SENSOR_UPDATE_INTERVAL_SECS s.
             Additionally, this is called on every update called from update page.
     """
 
@@ -60,10 +65,18 @@ class SensorCentral(tk.Tk):
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
 
+        # wait for file inputs to stabilise
+        if fh.check_serial_connection():
+            fh.wait_for_file_input(constants.dps310_temp_csv)
+            fh.wait_for_file_input(constants.tmp116_csv)
+            fh.wait_for_file_input(constants.hdc2010_temp_csv)
+            fh.wait_for_file_input(constants.hdc2010_hum_csv)
+
         for page in [pg.StartPage, pg.TMP116Page, pg.HDC2010Page, pg.OPT3001Page, pg.DPS310Page, pg.UpdatePage]:
             frame = page(container, self)
             self.frames[page] = frame
             frame.grid(row=0, column=0, sticky="nsew")
+
         self.show_frame(pg.StartPage)
 
     def show_frame(self, content):
@@ -72,11 +85,9 @@ class SensorCentral(tk.Tk):
 
     def app_update(self):
         pg.StartPage.update_start_data(self.frames[pg.StartPage])
+        self.pressure_update()
 
-        time = fh.check_pressure_diffs()
-        if time != '':
-            pg.StartPage.update_doors_message(self.frames[pg.StartPage], time)
-
+    def sensor_update(self):
         pg.TMP116Page.update_data(self.frames[pg.TMP116Page],
                                   [constants.tmp116_csv], [constants.temp_string], [constants.temp_measurement],
                                   [constants.temp_name])
@@ -97,6 +108,11 @@ class SensorCentral(tk.Tk):
                                   [constants.temp_measurement, constants.pressure_measurement],
                                   [constants.temp_name, constants.pressure_name], 5)
 
+    def pressure_update(self):
+        time = fh.check_pressure_diffs()
+        if time != '':
+            pg.StartPage.update_doors_message(self.frames[pg.StartPage], time)
+            pg.StartPage.update_start_data(self.frames[pg.StartPage])
 
 
 def call_repeatedly(interval, func, *args):
@@ -108,7 +124,7 @@ def call_repeatedly(interval, func, *args):
         while not stopped.wait(interval):  # the first call is in `interval` secs
             func(*args)
 
-    threading.Thread(target=loop).start()
+    threading.Thread(target=loop, daemon=True).start()
     return stopped.set
 
 
@@ -116,13 +132,16 @@ if __name__ == '__main__':
     fh.folder_prep()  # prepare csv folder
     fh.connect_to_serial()  # start serial communication if available
 
-    fh.wait_for_file_input(constants.dps310_temp_csv)  # wait for file inputs to stabilise
-
     app = SensorCentral()  # start the app
-    cancel_future_calls = call_repeatedly(10, app.app_update, )  # call for repeated app update
+    cancel_future_calls = call_repeatedly(constants.START_UPDATE_INTERVAL_SECS,
+                                          app.app_update, )  # call for repeated app update and door open checks
+    cancel_sensor_calls = call_repeatedly(constants.SENSOR_UPDATE_INTERVAL_SECS,
+                                          app.sensor_update, )  # call for repeated sensor page updates
+
     app.iconbitmap(constants.ICON_PATH)  # set app icon
 
     app.mainloop()  # enter main app loop after repeated calls instantiated
 
     cancel_future_calls()  # cancel future calls after window closes
+    cancel_sensor_calls()  # cancel sensor page update calls
     sys.exit()  # exit program after window closes
