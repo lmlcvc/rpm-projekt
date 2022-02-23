@@ -9,8 +9,8 @@ methods:
     * impl_circular_buffer - treats each sensor's CSV as a circular buffer with BUFFER_MINUTES length
     * store_to_csv - listens to serial port and writes values to appropriate CSV files
     * write_to_config - updates config.ini (and app functionalities) when called
-    * check_serial_connection() - check if SERIAL_PORT Arduino communication available
-    * connect_to_serial() - connect to Arduino communicarion on SERIAL_PORT if available
+    * check_serial_connection - check if SERIAL_PORT Arduino communication available
+    * connect_to_serial - connect to Arduino communication on SERIAL_PORT if available
     * check_pressure_diffs - detects significant pressure differences that could mean door/window opening
 """
 import os
@@ -82,7 +82,7 @@ def check_pressure_diffs():
 
         # there can be multiple rows w/ same min/max value
         # return the first one because the HH:MM value would be same either way
-        if max_value_row['Vrijednost'].iloc[0] - min_value_row['Vrijednost'].iloc[0] > 5:
+        if max_value_row['Vrijednost'].iloc[0] - min_value_row['Vrijednost'].iloc[0] > constants.PRESSURE_DIFF_PA:
 
             # return the sooner timestamp in HH:MM format or '' if not applicable
             if max_value_row['Vrijeme'].iloc[0] < min_value_row['Vrijeme'].iloc[0]:
@@ -104,16 +104,18 @@ def impl_circular_buffer(filepath):
     # open file, store lines newer than 10 minutes to list
     # discard older lines
     with open(filepath, 'r') as file:
-        lines = []
-        now = datetime.now()
+        lines = []  # list of file lines
+        now = datetime.now()  # current time
+
         for row in file.readlines():
             data = row.split(',')
-            timestamp = datetime.strptime(data[0], '%d/%m/%Y %H:%M:%S')
+            timestamp = datetime.strptime(data[0], '%d/%m/%Y %H:%M:%S')  # get timestamp from row
 
-            time_delta = now - timestamp
-            seconds_delta = time_delta.total_seconds()
-            minutes_delta = seconds_delta / 60
+            time_delta = now - timestamp  # calculate difference between row time and current time
+            seconds_delta = time_delta.total_seconds()  # -> to seconds
+            minutes_delta = seconds_delta / 60  # -> to minutes
 
+            # append to lines only rows newer than BUFFER_MINUTES minutes
             if minutes_delta < constants.BUFFER_MINUTES:
                 lines.append(row)
     file.close()

@@ -13,7 +13,10 @@ It also defines all methods necessary for runtime app use.
 import sys
 import threading
 import tkinter as tk
+
+import geocoder as geocoder
 import matplotlib
+import requests
 
 import file_handler as fh
 import pages as pg
@@ -76,6 +79,7 @@ class SensorCentral(tk.Tk):
             frame = page(container, self)
             self.frames[page] = frame
             frame.grid(row=0, column=0, sticky="nsew")
+
         self.show_frame(pg.StartPage)
 
     def show_frame(self, content):
@@ -123,13 +127,19 @@ def call_repeatedly(interval, func, *args):
         while not stopped.wait(interval):  # the first call is in `interval` secs
             func(*args)
 
-    threading.Thread(target=loop).start()
+    threading.Thread(target=loop, daemon=True).start()
     return stopped.set
 
 
 if __name__ == '__main__':
     fh.folder_prep()  # prepare csv folder
     fh.connect_to_serial()  # start serial communication if available
+
+    g = geocoder.ip('me')
+    print(g.latlng)
+
+    # response = requests.get(f"https://api.sunrise-sunset.org/json?lat={g.latlng[0]}&lng={g.latlng[1]}")
+    # print(response['results'], type(response))
 
     app = SensorCentral()  # start the app
     cancel_future_calls = call_repeatedly(constants.START_UPDATE_INTERVAL_SECS,

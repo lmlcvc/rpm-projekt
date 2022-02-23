@@ -259,7 +259,7 @@ class SensorPage(tk.Frame):
                 list of graph titles
 
             :param color: int
-                index of graph color # TODO: check?
+                index of graph color
         """
 
         file_num = 0
@@ -443,29 +443,30 @@ class StartPage(tk.Frame):
     """
 
     def update_start_data(self):
+        figure1 = ec.make_plots([tmp116_csv, hdc2010_temp_csv, dps310_temp_csv], (5, 3), 'Temperatura', '°C')
+        figure2 = ec.make_plots([hdc2010_hum_csv], (5, 3), 'Vlažnost zraka', '%', 3)
+        figure3 = ec.make_plots([opt3001_csv], (5, 3), 'Svjetlina', 'lux', 4)
+        figure4 = ec.make_plots([dps310_pressure_csv], (5, 3), 'Atmosferski tlak', 'Pa', 5)
+
         # temperature graph (3 sensors' values)
-        figure = ec.make_plots([tmp116_csv, hdc2010_temp_csv, dps310_temp_csv], (5, 3), 'Temperatura', '°C')
-        canvas = FigureCanvasTkAgg(figure, self)
-        canvas.draw()
-        canvas.get_tk_widget().place(x=50, y=160)
+        canvas1 = FigureCanvasTkAgg(figure1, self)
+        canvas1.draw()
+        canvas1.get_tk_widget().place(x=50, y=160)
 
         # humidity graph
-        figure = ec.make_plots([hdc2010_hum_csv], (5, 3), 'Vlažnost zraka', '%', 3)
-        canvas = FigureCanvasTkAgg(figure, self)
-        canvas.draw()
-        canvas.get_tk_widget().place(x=600, y=160)
+        canvas2 = FigureCanvasTkAgg(figure2, self)
+        canvas2.draw()
+        canvas2.get_tk_widget().place(x=600, y=160)
 
         # light levels graph
-        figure = ec.make_plots([opt3001_csv], (5, 3), 'Svjetlina', 'lux', 4)
-        canvas = FigureCanvasTkAgg(figure, self)
-        canvas.draw()
-        canvas.get_tk_widget().place(x=50, y=480)
+        canvas3 = FigureCanvasTkAgg(figure3, self)
+        canvas3.draw()
+        canvas3.get_tk_widget().place(x=50, y=480)
 
         # atmospheric pressure graph
-        figure = ec.make_plots([dps310_pressure_csv], (5, 3), 'Atmosferski tlak', 'Pa', 5)
-        canvas = FigureCanvasTkAgg(figure, self)
-        canvas.draw()
-        canvas.get_tk_widget().place(x=600, y=480)
+        canvas4 = FigureCanvasTkAgg(figure4, self)
+        canvas4.draw()
+        canvas4.get_tk_widget().place(x=600, y=480)
 
         # current values calculation and label
         try:
