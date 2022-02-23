@@ -123,7 +123,8 @@ if __name__ == '__main__':
     fh.connect_to_serial()  # start serial communication if available
 
     app = SensorCentral()  # start the app
-    cancel_future_calls = call_repeatedly(10, app.app_update, )  # call for repeated app update
+    cancel_future_calls = call_repeatedly(constants.APP_UPDATE_INTERVAL_SECS,
+                                          app.app_update, )  # call for repeated app update
     app.iconbitmap(constants.ICON_PATH)  # set app icon
 
     app.mainloop()  # enter main app loop after repeated calls instantiated

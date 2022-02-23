@@ -30,6 +30,7 @@ except serial.serialutil.SerialException:
 
 # Basic application info
 headers = ['Vrijeme', 'Senzor', 'Velicina', 'Vrijednost']
+APP_UPDATE_INTERVAL_SECS = 5
 BUFFER_MINUTES = 10
 NUM_OF_SENSORS = 6
 LARGE_FONT = ("Verdana", 16)
