@@ -135,4 +135,5 @@ if __name__ == '__main__':
     app.mainloop()  # enter main app loop after repeated calls instantiated
 
     cancel_future_calls()  # cancel future calls after window closes
+    cancel_pressure_calls()  # cancel pressure calls
     sys.exit()  # exit program after window closes
