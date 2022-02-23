@@ -60,6 +60,13 @@ class SensorCentral(tk.Tk):
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
 
+        # wait for file inputs to stabilise
+        if fh.check_serial_connection():
+            fh.wait_for_file_input(constants.dps310_temp_csv)
+            fh.wait_for_file_input(constants.tmp116_csv)
+            fh.wait_for_file_input(constants.hdc2010_temp_csv)
+            fh.wait_for_file_input(constants.hdc2010_hum_csv)
+
         for page in [pg.StartPage, pg.TMP116Page, pg.HDC2010Page, pg.OPT3001Page, pg.DPS310Page, pg.UpdatePage]:
             frame = page(container, self)
             self.frames[page] = frame
@@ -98,7 +105,6 @@ class SensorCentral(tk.Tk):
                                   [constants.temp_name, constants.pressure_name], 5)
 
 
-
 def call_repeatedly(interval, func, *args):
     """ Call func(*args) every {interval} seconds. """
 
@@ -115,8 +121,6 @@ def call_repeatedly(interval, func, *args):
 if __name__ == '__main__':
     fh.folder_prep()  # prepare csv folder
     fh.connect_to_serial()  # start serial communication if available
-
-    fh.wait_for_file_input(constants.dps310_temp_csv)  # wait for file inputs to stabilise
 
     app = SensorCentral()  # start the app
     cancel_future_calls = call_repeatedly(10, app.app_update, )  # call for repeated app update

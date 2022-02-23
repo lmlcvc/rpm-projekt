@@ -52,7 +52,7 @@ def wait_for_file_input(filepath):
             filepath - location of the file waiting for input
     """
 
-    while ((os.path.exists(filepath) and os.path.getsize(filepath) == 0)
+    while ((os.path.exists(filepath) and os.stat(filepath).st_size == 0)
            or not os.path.exists(filepath)):
         pass
 

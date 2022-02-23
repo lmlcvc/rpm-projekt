@@ -9,6 +9,8 @@ functions:
     * construct_labels - constructs labels based on current value; can include tips as well
 """
 import importlib
+import os
+
 import pandas as pd
 from matplotlib import pyplot as plt
 
@@ -27,29 +29,42 @@ def make_plots(filepaths, figsize=None, title=None, unit=None, def_color_idx=-1)
         Arguments:
             filepaths - locations of files whose readings are to be plotted on the figure
             figsize - size of figure; default (5, 4)
-            def_color_idx - # TODO: define when colouring is modified
+            def_color_idx - line colour index in constants.colors
     """
 
     if figsize is None:  # define default figsize
         figsize = (5, 4)
 
     for filepath in filepaths:
-        fh.wait_for_file_input(filepath)
-        fh.impl_circular_buffer(filepath)
+        if ((os.path.exists(filepath) and os.stat(filepath).st_size == 0)
+                or not os.path.exists(filepath)):
+            filepaths.remove(filepath)
+        else:
+            # implement circular buffer if serial communication is working
+            # if not, just show old data
+            if fh.check_serial_connection():
+                fh.impl_circular_buffer(filepath)
 
     df_list = [pd.read_csv(filepath, names=constants.headers) for filepath in filepaths]
     figure = plt.Figure(figsize=figsize, dpi=100)
     ax = figure.add_subplot(111)
 
     for i in range(len(df_list)):
-        # TODO: znam zašto radi ali je ružno
+        # when plotting multiple lines on graph, make them r-g-b-...
         if def_color_idx == -1:
             color_idx = i
         else:
             color_idx = def_color_idx
-        df_list[i].plot(ax=ax, kind='line', color=constants.colors[color_idx], fontsize=10)
 
-    ax.legend([df.Senzor[0] for df in df_list])
+        # place plot of current line to graph
+        if not df_list[i].empty:
+            df_list[i].plot(ax=ax, kind='line', color=constants.colors[color_idx], fontsize=10)
+
+    try:
+        ax.legend([df.Senzor[0] for df in df_list])
+    except IndexError:
+        pass
+
     ax.set_title(title)
     ax.set_xticks([])
     ax.set_ylabel(unit, rotation=0)

@@ -282,21 +282,27 @@ class SensorPage(tk.Frame):
             avg_label.place(x=text_coords[file_num][0], y=text_coords[file_num][1])
 
             # Use last value from file as current value and place label accordingly
-            value = data.iloc[-1]['Vrijednost']
-            self.current_message[file_num].set(ec.construct_labels(
-                measure=values[file_num], value=value))
-            indicator_label = tk.Label(self,
-                                       textvariable=self.current_message[file_num],
-                                       font=MID_FONT)
-            indicator_label.place(x=current_coords[file_num][0], y=current_coords[file_num][1])
+            try:
+                value = data.iloc[-1]['Vrijednost']
+                self.current_message[file_num].set(ec.construct_labels(
+                    measure=values[file_num], value=value))
+                indicator_label = tk.Label(self,
+                                           textvariable=self.current_message[file_num],
+                                           font=MID_FONT)
+                indicator_label.place(x=current_coords[file_num][0], y=current_coords[file_num][1])
+            except IndexError:
+                pass
 
             # Calculate and place period label
-            period_start = pd.read_csv(files[0], names=headers)['Vrijeme'].iloc[0]
-            period_end = pd.read_csv(files[0], names=headers)['Vrijeme'].iloc[-1]
-            period_label = tk.Label(self, text=f'Period: {period_start} do {period_end}',
-                                    anchor="w", justify=LEFT, font=MID_FONT)
-            period_label.place(x=period_sensorpage_coords['x'],
-                               y=period_sensorpage_coords['y'])
+            try:
+                period_start = pd.read_csv(files[0], names=headers)['Vrijeme'].iloc[0]
+                period_end = pd.read_csv(files[0], names=headers)['Vrijeme'].iloc[-1]
+                period_label = tk.Label(self, text=f'Period: {period_start} do {period_end}',
+                                        anchor="w", justify=LEFT, font=MID_FONT)
+                period_label.place(x=period_sensorpage_coords['x'],
+                                   y=period_sensorpage_coords['y'])
+            except IndexError:
+                pass
 
             file_num += 1
 
@@ -462,12 +468,27 @@ class StartPage(tk.Frame):
         canvas.get_tk_widget().place(x=600, y=480)
 
         # current values calculation and label
-        temp_value = round(np.average([pd.read_csv(tmp116_csv, names=headers)['Vrijednost'].iloc[-1],
-                                       pd.read_csv(hdc2010_temp_csv, names=headers)['Vrijednost'].iloc[-1],
-                                       pd.read_csv(dps310_temp_csv, names=headers)['Vrijednost'].iloc[-1]]), 4)
-        hum_value = pd.read_csv(hdc2010_hum_csv, names=headers)['Vrijednost'].iloc[-1]
-        light_value = pd.read_csv(opt3001_csv, names=headers)['Vrijednost'].iloc[-1]
-        pressure_value = pd.read_csv(dps310_pressure_csv, names=headers)['Vrijednost'].iloc[-1]
+        try:
+            temp_value = round(np.average([pd.read_csv(tmp116_csv, names=headers)['Vrijednost'].iloc[-1],
+                                           pd.read_csv(hdc2010_temp_csv, names=headers)['Vrijednost'].iloc[-1],
+                                           pd.read_csv(dps310_temp_csv, names=headers)['Vrijednost'].iloc[-1]]), 4)
+        except IndexError:
+            temp_value = None
+
+        try:
+            hum_value = pd.read_csv(hdc2010_hum_csv, names=headers)['Vrijednost'].iloc[-1]
+        except IndexError:
+            hum_value = None
+
+        try:
+            light_value = pd.read_csv(opt3001_csv, names=headers)['Vrijednost'].iloc[-1]
+        except IndexError:
+            light_value = None
+
+        try:
+            pressure_value = pd.read_csv(dps310_pressure_csv, names=headers)['Vrijednost'].iloc[-1]
+        except IndexError:
+            pressure_value = None
 
         self.indicator_message.set(ec.construct_labels(temp=temp_value, humidity=hum_value, light=light_value,
                                                        pressure=pressure_value, tips_wanted=True))
@@ -476,11 +497,14 @@ class StartPage(tk.Frame):
                               y=start_text_coords['y'])
 
         # measuring period calculation and label
-        period_start = pd.read_csv(opt3001_csv, names=headers)['Vrijeme'].iloc[0]
-        period_end = pd.read_csv(opt3001_csv, names=headers)['Vrijeme'].iloc[-1]
-        period_label = tk.Label(self, text=f'Period :  {period_start}\ndo {period_end}',
-                                anchor="w", justify=LEFT, font=MID_FONT)
-        period_label.place(x=period_coords['x'], y=period_coords['y'])
+        try:
+            period_start = pd.read_csv(opt3001_csv, names=headers)['Vrijeme'].iloc[0]
+            period_end = pd.read_csv(opt3001_csv, names=headers)['Vrijeme'].iloc[-1]
+            period_label = tk.Label(self, text=f'Period :  {period_start}\ndo {period_end}',
+                                    anchor="w", justify=LEFT, font=MID_FONT)
+            period_label.place(x=period_coords['x'], y=period_coords['y'])
+        except IndexError:
+            return
 
     def update_doors_message(self, time):
         self.doors_message.set(door_open_msg + time)
