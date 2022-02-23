@@ -30,7 +30,8 @@ except serial.serialutil.SerialException:
 
 # Basic application info
 headers = ['Vrijeme', 'Senzor', 'Velicina', 'Vrijednost']
-APP_UPDATE_INTERVAL_SECS = 5
+START_UPDATE_INTERVAL_SECS = 2
+SENSOR_UPDATE_INTERVAL_SECS = 10
 BUFFER_MINUTES = 10
 NUM_OF_SENSORS = 6
 APP_NAME = 'Centrala za upravljanje pametnim stanom'

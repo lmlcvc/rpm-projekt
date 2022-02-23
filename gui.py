@@ -79,7 +79,9 @@ class SensorCentral(tk.Tk):
 
     def app_update(self):
         pg.StartPage.update_start_data(self.frames[pg.StartPage])
+        self.pressure_update()
 
+    def sensor_update(self):
         pg.TMP116Page.update_data(self.frames[pg.TMP116Page],
                                   [constants.tmp116_csv], [constants.temp_string], [constants.temp_measurement],
                                   [constants.temp_name])
@@ -125,15 +127,15 @@ if __name__ == '__main__':
     fh.connect_to_serial()  # start serial communication if available
 
     app = SensorCentral()  # start the app
-    cancel_future_calls = call_repeatedly(constants.APP_UPDATE_INTERVAL_SECS,
-                                          app.app_update, )  # call for repeated app update
-    cancel_pressure_calls = call_repeatedly(constants.PRESSURE_INTERVAL_SECS,
-                                            app.pressure_update, ) # call repeated door open checks
+    cancel_future_calls = call_repeatedly(constants.START_UPDATE_INTERVAL_SECS,
+                                          app.app_update, )  # call for repeated app update and door open checks
+    cancel_sensor_calls = call_repeatedly(constants.PRESSURE_INTERVAL_SECS,
+                                          app.sensor_update, )  # call for repeated sensor page updates
 
     app.iconbitmap(constants.ICON_PATH)  # set app icon
 
     app.mainloop()  # enter main app loop after repeated calls instantiated
 
     cancel_future_calls()  # cancel future calls after window closes
-    cancel_pressure_calls()  # cancel pressure calls
+    cancel_sensor_calls()  # cancel sensor page update calls
     sys.exit()  # exit program after window closes
