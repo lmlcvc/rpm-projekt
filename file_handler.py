@@ -135,29 +135,32 @@ def store_to_csv():
             open(constants.dps310_temp_csv, 'a', newline='') as dps310_temp_file, \
             open(constants.dps310_pressure_csv, 'a', newline='') as dps310_pressure_file:
 
-        line = constants.serial.readline()  # read a byte string
+        try:
+            line = constants.serial.readline()  # read a byte string
 
-        now = datetime.now()
-        dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+            now = datetime.now()
+            dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
 
-        if line:
-            string = line.decode()  # convert the byte string to a unicode string
-            split_string = string.split(', ')
+            if line:
+                string = line.decode()  # convert the byte string to a unicode string
+                split_string = string.split(', ')
 
-            # choose write file location based on sensor name and value
-            # add current time to record
-            if split_string[0] == 'TMP116':
-                tmp116_file.write(dt_string + ', ' + string)
-            elif split_string[0] == 'HDC2010' and split_string[1] == 'temperature':
-                hdc2010_temp_file.write(dt_string + ', ' + string)
-            elif split_string[0] == 'HDC2010' and split_string[1] == 'humidity':
-                hdc2010_hum_file.write(dt_string + ', ' + string)
-            elif split_string[0] == 'OPT3001':
-                opt3001_file.write(dt_string + ', ' + string)
-            elif split_string[0] == 'DPS310' and split_string[1] == 'temperature':
-                dps310_temp_file.write(dt_string + ', ' + string)
-            elif split_string[0] == 'DPS310' and split_string[1] == 'pressure':
-                dps310_pressure_file.write(dt_string + ', ' + string)
+                # choose write file location based on sensor name and value
+                # add current time to record
+                if split_string[0] == 'TMP116':
+                    tmp116_file.write(dt_string + ', ' + string)
+                elif split_string[0] == 'HDC2010' and split_string[1] == 'temperature':
+                    hdc2010_temp_file.write(dt_string + ', ' + string)
+                elif split_string[0] == 'HDC2010' and split_string[1] == 'humidity':
+                    hdc2010_hum_file.write(dt_string + ', ' + string)
+                elif split_string[0] == 'OPT3001':
+                    opt3001_file.write(dt_string + ', ' + string)
+                elif split_string[0] == 'DPS310' and split_string[1] == 'temperature':
+                    dps310_temp_file.write(dt_string + ', ' + string)
+                elif split_string[0] == 'DPS310' and split_string[1] == 'pressure':
+                    dps310_pressure_file.write(dt_string + ', ' + string)
+        except AttributeError:
+            return
 
 
 def thread_serial():
