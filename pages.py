@@ -492,7 +492,7 @@ class StartPage(tk.Frame):
 
         self.indicator_message.set(ec.construct_labels(temp=temp_value, humidity=hum_value, light=light_value,
                                                        pressure=pressure_value, tips_wanted=True))
-        indicator_label = tk.Label(self, textvariable=self.indicator_message, font=MID_FONT, justify=LEFT)
+        indicator_label = tk.Label(self, textvariable=self.indicator_message, font=MID_FONT_SMALLER, justify=LEFT)
         indicator_label.place(x=start_text_coords['x'],
                               y=start_text_coords['y'])
 
@@ -517,6 +517,9 @@ class StartPage(tk.Frame):
 
         label = tk.Label(self, text=START_NAME, font=LARGE_FONT)
         label.pack(pady=10, padx=10)
+
+        label_current = tk.Label(self, text='TRENUTNE VRIJEDNOSTI:', font=MID_FONT_UNDERLINE)
+        label_current.place(x=1125, y=370)
 
         label_doors = tk.Label(self, textvariable=self.doors_message, font=MID_FONT)
         label_doors.place(x=doors_message_coords['x'], y=doors_message_coords['y'])

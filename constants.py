@@ -33,13 +33,17 @@ headers = ['Vrijeme', 'Senzor', 'Velicina', 'Vrijednost']
 APP_UPDATE_INTERVAL_SECS = 5
 BUFFER_MINUTES = 10
 NUM_OF_SENSORS = 6
-LARGE_FONT = ("Verdana", 16)
-MID_FONT = ("Verdana", 11)
 APP_NAME = 'Centrala za upravljanje pametnim stanom'
-START_NAME = 'Početna stranica'
+START_NAME = 'POČETNA STRANICA'
 ICON_PATH = uconfig['icon_path']
 PRESSURE_INTERVAL_SECS = 2
 PRESSURE_DIFF_PA = 4
+
+# Fonts
+LARGE_FONT = ("Verdana", 16)
+MID_FONT = ("Verdana", 11)
+MID_FONT_UNDERLINE = ("Verdana", 11, "underline")
+MID_FONT_SMALLER = ("Verdana", 10)
 
 # Coordinates arrays - allow element coordinates depend on number of elements in frame
 graph_coords = [[100, 150], [650, 150]]
