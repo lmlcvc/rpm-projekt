@@ -100,7 +100,7 @@ messages = {'low_temp': 'Hladno je. ',
             'high_light_tip': '\u26A0 Zamračite prostoriju. ',
             'low_pressure': 'Atmosferski tlak je nizak. ',
             'low_pressure_tip': 'Mogli biste očekivati kišno vrijeme. ',
-            'normal_pressure': 'Atmosferski tlak je ugodan. ',
+            'normal_pressure': 'Atmosferski tlak je normalan. ',
             'high_pressure': 'Atmosferski tlak je visok. ',
             'high_pressure_tip': 'Vrijeme će biti vedro i suho. '}
 
