@@ -67,6 +67,7 @@ def make_plots(filepaths, figsize=None, title=None, unit=None, def_color_idx=-1)
 
     ax.set_title(title)
     ax.set_xticks([])
+    ax.tick_params(axis='both', labelsize=8)
     ax.set_ylabel(unit, rotation=0)
     ax.set_xlabel('vrijeme', rotation=0)
     ax.ticklabel_format(useOffset=False)
