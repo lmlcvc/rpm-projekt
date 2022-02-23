@@ -104,6 +104,7 @@ class SensorCentral(tk.Tk):
         time = fh.check_pressure_diffs()
         if time != '':
             pg.StartPage.update_doors_message(self.frames[pg.StartPage], time)
+            pg.StartPage.update_start_data(self.frames[pg.StartPage])
 
 
 def call_repeatedly(interval, func, *args):
