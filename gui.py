@@ -39,8 +39,13 @@ class SensorCentral(tk.Tk):
             Raise the frame passed as 'content'.
 
         app_update(self)
-            Call update on all sensor pages and start page.
-            As specified in main, this is called every 10 s.
+            Call update on start page and check for door/window openings.
+            As specified in main, this is called every START_UPDATE_INTERVAL_SECS s.
+            Additionally, this is called on every update called from update page.
+
+        sensor_update(self)
+            Call update on sensor pages.
+            As specified in main, this is called every SENSOR_UPDATE_INTERVAL_SECS s.
             Additionally, this is called on every update called from update page.
     """
 
@@ -129,7 +134,7 @@ if __name__ == '__main__':
     app = SensorCentral()  # start the app
     cancel_future_calls = call_repeatedly(constants.START_UPDATE_INTERVAL_SECS,
                                           app.app_update, )  # call for repeated app update and door open checks
-    cancel_sensor_calls = call_repeatedly(constants.PRESSURE_INTERVAL_SECS,
+    cancel_sensor_calls = call_repeatedly(constants.SENSOR_UPDATE_INTERVAL_SECS,
                                           app.sensor_update, )  # call for repeated sensor page updates
 
     app.iconbitmap(constants.ICON_PATH)  # set app icon
