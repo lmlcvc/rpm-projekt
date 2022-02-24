@@ -65,7 +65,7 @@ class SensorCentral(tk.Tk):
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
 
-        # wait for file inputs to stabilise
+        # wait for file inputs to stabilise if serial connection available
         if fh.check_serial_connection():
             fh.wait_for_file_input(constants.dps310_temp_csv)
             fh.wait_for_file_input(constants.tmp116_csv)
@@ -133,15 +133,15 @@ if __name__ == '__main__':
     fh.connect_to_serial()  # start serial communication if available
 
     app = SensorCentral()  # start the app
-    cancel_future_calls = call_repeatedly(constants.START_UPDATE_INTERVAL_SECS,
-                                          app.app_update, )  # call for repeated app update and door open checks
-    cancel_sensor_calls = call_repeatedly(constants.SENSOR_UPDATE_INTERVAL_SECS,
-                                          app.sensor_update, )  # call for repeated sensor page updates
+
+    if fh.check_serial_connection():
+        cancel_future_calls = call_repeatedly(constants.START_UPDATE_INTERVAL_SECS,
+                                              app.app_update, )  # call for repeated app update and door open checks
+        cancel_sensor_calls = call_repeatedly(constants.SENSOR_UPDATE_INTERVAL_SECS,
+                                              app.sensor_update, )  # call for repeated sensor page updates
 
     app.iconbitmap(constants.ICON_PATH)  # set app icon
 
     app.mainloop()  # enter main app loop after repeated calls instantiated
 
-    cancel_future_calls()  # cancel future calls after window closes
-    cancel_sensor_calls()  # cancel sensor page update calls
     sys.exit()  # exit program after window closes
